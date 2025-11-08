@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Profile from './pages/Profile';
 import Subforum from './pages/Subforum';
 import Register from './pages/Register';
+import CreatePost from './pages/CreatePost';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<Feed />} />
           <Route path="/profile/:username" element={<Profile />} />
           <Route path="/subforum/:id" element={<Subforum />} />
+          <Route path="/create-post" element={<CreatePost />} />
         </Route>
 
         <Route element={<EmptyLayout />}>
