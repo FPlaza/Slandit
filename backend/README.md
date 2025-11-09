@@ -2,29 +2,6 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
 ## Project setup
 
 ```bash
@@ -44,55 +21,72 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Run tests
+## 🚀 Entorno de Desarrollo Local con Docker
+
+Este proyecto utiliza Docker Compose para crear un entorno de desarrollo local, idéntico y replicable para todos los miembros del equipo. El nombre del proyecto está definido como `slandit` dentro del archivo `docker-compose.yml`.
+
+Con un solo comando, se levantarán los siguientes servicios en segundo plano:
+* **PostgreSQL**: Base de datos de autenticación (Puerto: `5432`)
+* **MongoDB**: Base de datos principal del foro (Puerto: `27017`)
+* **Redis**: Capa de caché (Puerto: `6379`)
+
+La primera vez que se ejecuta, también se poblarán las bases de datos con datos de prueba (usuarios, subforos y publicaciones) para facilitar el desarrollo y las pruebas.
+
+### Prerrequisitos
+
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y en ejecución.
+
+---
+
+### 1. Primera Ejecución (o si el Seeder cambia)
+
+La primera vez que clones el proyecto, o si alguna vez se modifican los scripts de siembra (en `mongo-seeder` o `postgres-seed`), debes ejecutar:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker-compose up -d --build
 ```
 
-## Deployment
+* **`up`**: Inicia todos los contenedores.
+* **`-d`** (detached): Ejecuta los contenedores en **segundo plano** y te devuelve el control de la terminal.
+* **`--build`**: Le dice a Docker que construya la imagen de nuestro *seeder* (el script que puebla las BDD).
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Tus bases de datos quedarán listas y con datos de prueba.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+---
+
+### 2. Uso Diario (Iniciar el entorno)
+
+Para cualquier otro día de trabajo, simplemente ejecuta:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+docker-compose up -d
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Esto iniciará los contenedores en segundo plano. Todos los datos que hayas guardado en tus pruebas anteriores (nuevos usuarios, publicaciones, etc.) **se mantendrán**, ya que se guardan en volúmenes persistentes.
 
-## Resources
+---
 
-Check out a few resources that may come in handy when working with NestJS:
+### 3. Apagar el Entorno
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Cuando termines de trabajar, puedes apagar todo con:
 
-## Support
+```bash
+docker-compose down
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Esto detiene y *elimina* los contenedores de forma segura. **Tus datos NO se borrarán**, ya que viven en los volúmenes.
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### 🚨 Cómo Resetear la Base de Datos (¡Cuidado!)
 
-## License
+Si en algún momento quieres **borrar todos los datos** y volver al estado inicial (solo con los datos de prueba originales), debes eliminar los volúmenes.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Ejecuta el siguiente comando:
+
+```bash
+docker-compose down -v
+```
+
+* La bandera `-v` (de *volumes*) elimina los volúmenes de datos.
+* La próxima vez que ejecutes `docker-compose up -d --build`, el *seeder* volverá a correr y tendrás una base de datos limpia.
