@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Profile, ProfileDocument } from './entities/profile.schema';
 import { Model } from 'mongoose';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class ProfilesService {
@@ -18,5 +19,33 @@ export class ProfilesService {
         }
 
         return profile;
+    }
+
+    async createProfile(userId: string, username: string): Promise<ProfileDocument> {
+        const newProfile = new this.profileModel({
+            _id: userId,
+            username: username,
+            bio: '',
+            avatarUrl: '',
+            karma: 0,
+            currency: 50
+        });
+
+        return newProfile.save();
+    }
+
+    async updateProfile(id: string, updateProfileDto: UpdateProfileDto): Promise<ProfileDocument>{
+
+        const updatedProfile = await this.profileModel.findByIdAndUpdate(
+            id,
+            { $set: updateProfileDto },
+            { new: true },
+        ).exec();
+
+        if (!updatedProfile) {
+            throw new NotFoundException(`Perfil con ID ${id} no encontrado`)
+        }
+
+        return updatedProfile;
     }
 }

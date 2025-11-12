@@ -4,16 +4,23 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { ProfilesService } from 'src/profiles/profiles.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly profilesService: ProfilesService,
   ){}
 
   async register(createUserDto: CreateUserDto){
     const newUser = await this.usersService.createUser(createUserDto);
+
+    await this.profilesService.createProfile(
+      newUser.id,
+      newUser.username,
+    );
 
     const payload = {
       sub: newUser.id,
