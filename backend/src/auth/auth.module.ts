@@ -7,11 +7,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProfilesModule } from 'src/profiles/profiles.module';
 import { JwtStrategy } from './jwt.strategy';
+import { SubforumsModule } from 'src/subforums/subforums.module';
 
 @Module({
   imports: [
     UsersModule,
     ProfilesModule,
+    SubforumsModule,
     
     PassportModule.register({ defaultStrategy: 'jwt' }),
 

@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProfilesModule } from './profiles/profiles.module';
+import { SubforumsModule } from './subforums/subforums.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ProfilesModule } from './profiles/profiles.module';
     UsersModule,
     AuthModule,
     ProfilesModule,
+    SubforumsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -11,15 +11,15 @@ export class ProfilesController {
 
     @Get(':id')
     async findOne(@Param('id') id: string){
-        return this.profilesService.findProfileById(id);
+        return await this.profilesService.findProfileById(id);
     }
 
     @UseGuards(AuthGuard('jwt'))
     @Patch('me')
-    updateMyProfile(
+    async updateMyProfile(
         @Request() req,
-        @Body() UpdateProfileDto: UpdateProfileDto,
+        @Body() updateProfileDto: UpdateProfileDto,
     ){
-        return this.profilesService.updateProfile(req.user.id, UpdateProfileDto);
+        return await this.profilesService.updateProfile(req.user.id, updateProfileDto);
     }
 }

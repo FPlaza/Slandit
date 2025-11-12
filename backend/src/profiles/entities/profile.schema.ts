@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-@Schema({ collection: 'profiles' })
+@Schema({ collection: 'profiles', timestamps: true})
 export class Profile {
   
   @Prop({ type: String })
@@ -22,8 +22,6 @@ export class Profile {
   @Prop({ default: 0 })
   currency: number;
 
-  @Prop({ type: Date, default: Date.now })
-  createdAt: Date;
 }
 
 export const ProfileSchema = SchemaFactory.createForClass(Profile);
