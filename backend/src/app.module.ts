@@ -5,6 +5,8 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ProfilesModule } from './profiles/profiles.module';
 
 @Module({
   imports: [
@@ -28,8 +30,17 @@ import { AuthModule } from './auth/auth.module';
       }),
     }),
 
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGO_URI'),
+      }),
+    }),
+
     UsersModule,
     AuthModule,
+    ProfilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
