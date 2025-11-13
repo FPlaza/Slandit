@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProfilesModule } from './profiles/profiles.module';
 import { SubforumsModule } from './subforums/subforums.module';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { SubforumsModule } from './subforums/subforums.module';
     AuthModule,
     ProfilesModule,
     SubforumsModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
