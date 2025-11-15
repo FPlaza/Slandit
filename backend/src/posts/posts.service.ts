@@ -32,8 +32,8 @@ export class PostsService {
   async findPostById(id: string): Promise<PostDocument> {
     const post = await this.postModel
     .findById(id)
-    .populate('authorId')
-    .populate('subforumId')
+    .populate('authorId', '_id username avatarUrl')
+    .populate('subforumId', '_id name displayName')
     .exec();
 
     if (!post) {
