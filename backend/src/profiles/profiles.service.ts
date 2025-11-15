@@ -51,10 +51,6 @@ export class ProfilesService {
     }
 
     async findById(id: string) {
-        return this.profileModel.findById(new Types.ObjectId(id)).exec();
-    }
-
-    async findByUserId(userId: string) {
-        return this.profileModel.findOne({ userId }).exec();
+        return this.profileModel.findOne({ _id: id }).exec();
     }
 }
