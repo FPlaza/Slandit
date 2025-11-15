@@ -3,18 +3,19 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Profile, ProfileDocument } from './entities/profile.schema';
 import { Model } from 'mongoose';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class ProfilesService {
     constructor(
         @InjectModel(Profile.name)
         private profileModel: Model<ProfileDocument>,
-    ){}
+    ) { }
 
     async findProfileById(id: string): Promise<ProfileDocument> {
         const profile = await this.profileModel.findById(id).exec();
 
-        if (!profile){
+        if (!profile) {
             throw new NotFoundException(`Perfil con ID ${id} no encontrado`);
         }
 
@@ -34,7 +35,7 @@ export class ProfilesService {
         return newProfile.save();
     }
 
-    async updateProfile(id: string, updateProfileDto: UpdateProfileDto): Promise<ProfileDocument>{
+    async updateProfile(id: string, updateProfileDto: UpdateProfileDto): Promise<ProfileDocument> {
 
         const updatedProfile = await this.profileModel.findByIdAndUpdate(
             id,
@@ -47,5 +48,13 @@ export class ProfilesService {
         }
 
         return updatedProfile;
+    }
+
+    async findById(id: string) {
+        return this.profileModel.findById(new Types.ObjectId(id)).exec();
+    }
+
+    async findByUserId(userId: string) {
+        return this.profileModel.findOne({ userId }).exec();
     }
 }

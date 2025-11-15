@@ -9,6 +9,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ProfilesModule } from './profiles/profiles.module';
 import { SubforumsModule } from './subforums/subforums.module';
 import { PostsModule } from './posts/posts.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -19,16 +20,13 @@ import { PostsModule } from './posts/posts.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        
         host: configService.get<string>('DB_HOST', 'localhost'),
         port: configService.get<number>('DB_PORT', 5432),
         username: configService.get<string>('DB_USER', 'admin'),
         password: configService.get<string>('DB_PASSWORD', 'password123'),
         database: configService.get<string>('DB_NAME', 'auth_db'),
-
         autoLoadEntities: true,
-
-        synchronize: false, //Para desarrollo
+        synchronize: false,
       }),
     }),
 
@@ -40,6 +38,12 @@ import { PostsModule } from './posts/posts.module';
       }),
     }),
 
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET || 'supersecret',
+      signOptions: { expiresIn: '1d' },
+    }),
+
     UsersModule,
     AuthModule,
     ProfilesModule,
@@ -49,4 +53,4 @@ import { PostsModule } from './posts/posts.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
