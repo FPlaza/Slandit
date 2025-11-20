@@ -2,6 +2,7 @@ import './Header.css';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { MdSearch, MdNotifications, MdPerson, MdHome } from 'react-icons/md';
+import ThemeToggle from './ThemeToggle';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ export default function Header() {
         <button className="icon-btn" title="Perfil" onClick={handleProfile}>
           <MdPerson size={24} />
         </button>
+        <ThemeToggle />
       </nav>
       {showSearch && (
         <div className="search-overlay">

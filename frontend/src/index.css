@@ -1,11 +1,17 @@
 :root {
+  --bg: #332F3B;
+  --text: rgba(255, 255, 255, 0.87);
+  --link: #646cff;
+  --link-hover: #535bf2;
+  --button-bg: #1a1a1a;
+  --toggle-bg: #ffffff;
+  --toggle-fg: #111827;
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #332F3B;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,13 +19,81 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Theme overrides by data attribute on <html> */
+html[data-theme='dark'] {
+  --bg: #332F3B;
+  --text: rgba(255, 255, 255, 0.87);
+  --link: #646cff;
+  --link-hover: #535bf2;
+  --button-bg: #1a1a1a;
+  --toggle-bg: #ffffff;
+  --toggle-fg: #111827;
+  --header-bg: #332F3B;
+  --header-text: #9664FF;
+  --header-border: #4f3f6e;
+  --search-bg: #4c4255;
+  --search-input-bg: #2a0999;
+  --search-input-fg: #9664FF;
+  --sidebar-bg: #332F3B;
+  --sidebar-text: #9664FF;
+  --sidebar-border: #4f3f6e;
+  --sidebar-toggle-bg: #4d0cff;
+  --sidebar-toggle-fg: #ffffff;
+}
+
+html[data-theme='light'] {
+  --bg: #ffffff;
+  --text: #213547;
+  --link: #646cff;
+  --link-hover: #747bff;
+  --button-bg: #f9f9f9;
+  --toggle-bg: #111827;
+  --toggle-fg: #fff;
+  --header-bg: #ffffff;
+  --header-text: #213547;
+  --header-border: #e6e6ea;
+  --search-bg: #f3f4f6;
+  --search-input-bg: #ffffff;
+  --search-input-fg: #213547;
+  --sidebar-bg: #ffffff;
+  --sidebar-text: #213547;
+  --sidebar-border: #e6e6ea;
+  --sidebar-toggle-bg: #111827;
+  --sidebar-toggle-fg: #ffffff;
+}
+
+/* Card variables */
+:root {
+  --card-bg: var(--bg);
+  --card-border: rgba(0,0,0,0.06);
+  --card-title: var(--text);
+  --card-text: var(--text);
+  --muted-text: rgba(107,114,128,1);
+}
+
+html[data-theme='dark'] {
+  --card-bg: #3b3342;
+  --card-border: rgba(255,255,255,0.06);
+  --card-title: #fff;
+  --card-text: rgba(255,255,255,0.9);
+  --muted-text: rgba(203,213,225,0.6);
+}
+
+html[data-theme='light'] {
+  --card-bg: #ffffff;
+  --card-border: rgba(0,0,0,0.06);
+  --card-title: #0f172a;
+  --card-text: #0f172a;
+  --muted-text: rgba(100,116,139,1);
+}
+
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--link);
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--link-hover);
 }
 
 body {
@@ -28,6 +102,8 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
 }
 
 h1 {
@@ -42,7 +118,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--button-bg);
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -56,13 +132,9 @@ button:focus-visible {
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
+    --bg: #ffffff;
+    --text: #213547;
+    --link-hover: #747bff;
+    --button-bg: #f9f9f9;
   }
 }
