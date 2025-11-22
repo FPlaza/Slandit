@@ -12,25 +12,31 @@ import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        
-        host: configService.get<string>('DB_HOST', 'localhost'),
-        port: configService.get<number>('DB_PORT', 5432),
-        username: configService.get<string>('DB_USER', 'admin'),
-        password: configService.get<string>('DB_PASSWORD', 'password123'),
-        database: configService.get<string>('DB_NAME', 'auth_db'),
+
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USER'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_NAME'),
 
         autoLoadEntities: true,
-
-        synchronize: false, //Para desarrollo
+        synchronize: false,
+        ssl: {
+          rejectUnauthorized: false, // Requerido para Supabase
+        },
       }),
     }),
+
 
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -49,4 +55,4 @@ import { PostsModule } from './posts/posts.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
