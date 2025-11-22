@@ -24,13 +24,17 @@ export const authService = {
       username,
       password,
     });
-    
+
     return handleAuthSuccess(response.data);
   },
 
-  async login(email: string, password: string) { //Falta lógica login
-    console.log('Login no implementado');
-    return null;
+  async login(email: string, password: string) {
+    const response = await axios.post<AuthResponse>(`${API_URL}/auth/login`, {
+      email,
+      password,
+    });
+
+    return handleAuthSuccess(response.data);
   },
 
   logout() {

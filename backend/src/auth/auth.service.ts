@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ProfilesService } from 'src/profiles/profiles.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -12,9 +13,9 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly profilesService: ProfilesService,
-  ){}
+  ) { }
 
-  async register(createUserDto: CreateUserDto){
+  async register(createUserDto: CreateUserDto) {
     const newUser = await this.usersService.createUser(createUserDto);
 
     await this.profilesService.createProfile(
@@ -35,23 +36,31 @@ export class AuthService {
       user: newUser,
     };
   }
-  // create(createAuthDto: CreateAuthDto) {
-  //   return 'This action adds a new auth';
-  // }
 
-  // findAll() {
-  //   return `This action returns all auth`;
-  // }
+  async login(email: string, password: string) {
+    const user = await this.usersService.findByEmail(email);
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} auth`;
-  // }
+    if (!user) {
+      throw new UnauthorizedException('Usuario no encontrado');
+    }
 
-  // update(id: number, updateAuthDto: UpdateAuthDto) {
-  //   return `This action updates a #${id} auth`;
-  // }
+    const passwordMatches = await bcrypt.compare(password, user.passwordHash);
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} auth`;
-  // }
+    if (!passwordMatches) {
+      throw new UnauthorizedException('Contraseña incorrecta');
+    }
+
+    const payload = {
+      sub: user.id,
+      username: user.username,
+      email: user.email,
+    };
+
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    return {
+      accessToken,
+      user,
+    };
+  }
 }
