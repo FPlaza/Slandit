@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Subforum } from '../../subforums/entities/subforums.schema';
 
 @Schema({ collection: 'profiles', timestamps: true})
 export class Profile {
@@ -21,6 +22,11 @@ export class Profile {
 
   @Prop({ default: 0 })
   currency: number;
+
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: Subforum.name }]
+  })
+  joinedSubforums: Subforum[];
 
 }
 

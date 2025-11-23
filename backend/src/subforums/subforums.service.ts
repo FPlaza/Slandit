@@ -4,12 +4,15 @@ import { UpdateSubforumDto } from './dto/update-subforum.dto';
 import { Subforum, SubforumDocument } from './entities/subforums.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Profile, ProfileDocument } from '../profiles/entities/profile.schema';
 
 @Injectable()
 export class SubforumsService {
   constructor(
     @InjectModel(Subforum.name)
-    private subforumModel: Model<SubforumDocument>
+    private subforumModel: Model<SubforumDocument>,
+    @InjectModel(Profile.name)
+    private profileModel: Model<ProfileDocument>
   ){}
 
   async createSubforum(adminId: string, createSubforumDto: CreateSubforumDto): Promise<SubforumDocument> {
@@ -36,5 +39,42 @@ export class SubforumsService {
     }
 
     return subforum;
+  }
+
+  async joinSubforum(subforumId: string, userId: string) {
+    const subforumExists = await this.subforumModel.exists({ _id: subforumId });
+    if (!subforumExists) throw new NotFoundException('Subforo no encontrado');
+
+    const userProfile = await this.profileModel.findByIdAndUpdate(userId, {
+      $addToSet: { joinedSubforums: subforumId } 
+    });
+
+    if (!userProfile) {
+      throw new NotFoundException('Perfil de usuario no encontrado');
+    }
+
+    const wasAlreadyJoined = (userProfile.joinedSubforums || []).some(
+      (id) => id.toString() === subforumId.toString()
+    );
+
+    if (!wasAlreadyJoined) {
+       await this.subforumModel.findByIdAndUpdate(subforumId, {
+         $inc: { memberCount: 1 }
+       });
+    }
+
+    return { message: 'Te has unido al subforo' };
+  }
+
+  async leaveSubforum(subforumId: string, userId: string) {
+     await this.profileModel.findByIdAndUpdate(userId, {
+       $pull: { joinedSubforums: subforumId }
+     });
+     
+     await this.subforumModel.findByIdAndUpdate(subforumId, {
+        $inc: { memberCount: -1 }
+     });
+     
+     return { message: 'Has salido del subforo' };
   }
 }

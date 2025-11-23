@@ -17,6 +17,18 @@ export class SubforumsController {
     return await this.subforumsService.createSubforum(req.user.id ,createSubforumDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
+  @Post(':id/join')
+  async join(@Param('id') subforumId: string, @Request() req) {
+    return this.subforumsService.joinSubforum(subforumId, req.user.id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post(':id/leave')
+  async leave(@Param('id') subforumId: string, @Request() req) {
+    return this.subforumsService.leaveSubforum(subforumId, req.user.id);
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string){ //agregar Parsers
     return await this.subforumsService.findSubforumById(id);

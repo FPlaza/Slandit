@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, MAX, MaxLength } from "class-validator";
+import { IsString, IsNotEmpty, MaxLength, IsOptional, IsUrl } from 'class-validator';
 
 export class CreateSubforumDto {
 
@@ -16,4 +16,12 @@ export class CreateSubforumDto {
     @IsOptional()
     @MaxLength(500)
     description?: string;
+
+    @IsUrl()
+    @IsOptional()
+    icon?: string;
+
+    @IsUrl()
+    @IsOptional()
+    banner?: string;
 }

@@ -48,4 +48,17 @@ export class ProfilesService {
 
         return updatedProfile;
     }
+
+    async findMyProfileWithSubforums(id: string): Promise<ProfileDocument> {
+        const profile = await this.profileModel.findById(id)
+            .populate({
+                path: 'joinedSubforums',
+                select: 'name displayName icon banner'
+            })
+            .exec();
+
+        if (!profile) throw new NotFoundException();
+
+        return profile;
+    }
 }

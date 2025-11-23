@@ -9,10 +9,12 @@ export class ProfilesController {
         private readonly profilesService: ProfilesService
     ){}
 
-    @Get(':id')
-    async findOne(@Param('id') id: string){
-        return await this.profilesService.findProfileById(id);
+    @UseGuards(AuthGuard('jwt'))
+    @Get('me')
+    async findMyProfile(@Request() req) {
+        return this.profilesService.findMyProfileWithSubforums(req.user.id);
     }
+    
 
     @UseGuards(AuthGuard('jwt'))
     @Patch('me')
@@ -21,5 +23,10 @@ export class ProfilesController {
         @Body() updateProfileDto: UpdateProfileDto,
     ){
         return await this.profilesService.updateProfile(req.user.id, updateProfileDto);
+    }
+
+    @Get(':id')
+    async findOne(@Param('id') id: string){
+        return await this.profilesService.findProfileById(id);
     }
 }

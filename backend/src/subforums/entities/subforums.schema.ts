@@ -13,14 +13,18 @@ export class Subforum {
     @Prop()
     description: string;
 
+    @Prop({ default: null }) 
+    icon: string;
+
+    @Prop({ default: null })
+    banner: string;
+
     @Prop({ type: String, required: true})
     administrator: string;
 
     @Prop({ type: Number, default: 1})
     memberCount: number;
-
 }
 
 export const SubforumSchema = SchemaFactory.createForClass(Subforum);
-
 export type SubforumDocument = Subforum & Document;
