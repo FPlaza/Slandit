@@ -9,6 +9,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ProfilesModule } from './profiles/profiles.module';
 import { SubforumsModule } from './subforums/subforums.module';
 import { PostsModule } from './posts/posts.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { PostsModule } from './posts/posts.module';
     ProfilesModule,
     SubforumsModule,
     PostsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
