@@ -10,6 +10,8 @@ import { ProfilesModule } from './profiles/profiles.module';
 import { SubforumsModule } from './subforums/subforums.module';
 import { PostsModule } from './posts/posts.module';
 import { CommentsModule } from './comments/comments.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
 
 @Module({
   imports: [
@@ -44,6 +46,22 @@ import { CommentsModule } from './comments/comments.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         uri: configService.get<string>('MONGO_URI'),
+      }),
+    }),
+
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        store: await redisStore({
+          socket: {
+            host: configService.get<string>('REDIS_HOST'),
+            port: configService.get<number>('REDIS_PORT'),
+          },
+          password: configService.get<string>('REDIS_PASSWORD') || undefined,
+          ttl: 60000,
+        }),
       }),
     }),
 
