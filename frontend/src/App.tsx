@@ -7,7 +7,6 @@ import Profile from './pages/Profile';
 import Subforum from './pages/Subforum';
 import Register from './pages/Register';
 import CreatePost from './pages/CreatePost';
-import EditProfile from './pages/EditProfile';
 
 function App() {
   return (
@@ -18,7 +17,6 @@ function App() {
           <Route path="/profile/:username" element={<Profile />} />
           <Route path="/subforum/:id" element={<Subforum />} />
           <Route path="/create-post" element={<CreatePost />} />
-          <Route path="/editar-perfil" element={<EditProfile />} />
         </Route>
 
         <Route element={<EmptyLayout />}>
