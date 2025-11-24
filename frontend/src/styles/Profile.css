@@ -27,6 +27,7 @@
     width: 120px;
     height: 120px;
     border-radius: 12px;
+    /* Considerar 50% si se quiere circular */
     object-fit: cover;
     box-shadow: var(--card-shadow);
 }
@@ -50,7 +51,6 @@
     line-height: 1.5;
 }
 
-.edit-button,
 .historial-button {
     padding: 8px 16px;
     border: none;
@@ -75,4 +75,100 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+}
+
+/* Avatar edit icon */
+.avatar-container {
+    position: relative;
+    display: inline-block;
+}
+
+.avatar-edit-btn {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    color: #4a4a4a;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    font-size: 16px;
+    padding: 0;
+}
+
+.bio-edit-btn {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    color: #4a4a4a;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    font-size: 16px;
+    padding: 0;
+    margin: 0;
+}
+
+.profile-bio {
+    margin-top: 12px;
+    max-width: 720px;
+    color: var(--card-text);
+    line-height: 1.5;
+    padding-right: 40px;
+}
+
+.avatar-edit-popup {
+    margin-top: 10px;
+    background: var(--card-bg);
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.popup-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Bio edit button */
+.bio-container {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    align-items: start;
+}
+
+/* Bio editor */
+.bio-editor textarea {
+    width: 100%;
+    height: 80px;
+    border-radius: 6px;
+    padding: 8px;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--card-text);
+}
+
+.bio-actions {
+    margin-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
 }

@@ -2,12 +2,11 @@ import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { mockProfile, mockPosts, mockProfiles } from '../mocks/mockData';
 import PostCard from '../components/PostCard';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import '../styles/Profile.css';
 
 function Profile() {
   const { username } = useParams();
-  const navigate = useNavigate();
 
   const aliasMap: Record<string, string> = {
     usuario: mockProfile.username,
@@ -49,6 +48,13 @@ function Profile() {
     };
   }, [effectiveUsername]);
 
+  const [isEditingAvatar, setIsEditingAvatar] = useState(false);
+  const [isEditingBio, setIsEditingBio] = useState(false);
+
+  const [newAvatar, setNewAvatar] = useState(profile.avatarUrl);
+  const [newBio, setNewBio] = useState(profile.bio);
+
+
   const posts = useMemo(() => {
     const target = (effectiveUsername || '').toLowerCase();
     return mockPosts
@@ -65,25 +71,72 @@ function Profile() {
       <div className="profile-wrapper">
 
         <section className="profile-card">
-          <img
-            src={profile.avatarUrl || '/icons/surprisedrudo.png'}
-            alt={profile.displayName || username}
-            className="profile-avatar"
-          />
+          <div className="avatar-container">
+            <img
+              src={newAvatar || '/icons/surprisedrudo.png'}
+              alt={profile.username}
+              className="profile-avatar"
+            />
+
+            <button
+              className="avatar-edit-btn"
+              onClick={() => setIsEditingAvatar(true)}
+            >
+              ✏️
+            </button>
+
+            {isEditingAvatar && (
+              <div className="avatar-edit-popup">
+                <label>
+                  Nueva URL de avatar:
+                  <input
+                    type="text"
+                    value={newAvatar}
+                    onChange={(e) => setNewAvatar(e.target.value)}
+                  />
+                </label>
+
+                <div className="popup-actions">
+                  <button onClick={() => setIsEditingAvatar(false)}>Cancelar</button>
+                  <button onClick={() => setIsEditingAvatar(false)}>Guardar</button>
+                </div>
+              </div>
+            )}
+          </div>
 
           <div className="profile-info">
             <h2 className="profile-username">@{profile.username}</h2>
-            <p className="profile-bio">{profile.bio || 'Sin descripción.'}</p>
+            <div className="bio-container">
+              {!isEditingBio ? (
+                <>
+                  <p className="profile-bio">{newBio || 'Sin descripción.'}</p>
+
+                  <button
+                    className="bio-edit-btn"
+                    onClick={() => setIsEditingBio(true)}
+                  >
+                    ✏️
+                  </button>
+                </>
+              ) : (
+                <div className="bio-editor">
+                  <textarea
+                    value={newBio}
+                    onChange={(e) => setNewBio(e.target.value)}
+                  />
+
+                  <div className="bio-actions">
+                    <button onClick={() => setIsEditingBio(false)}>Cancelar</button>
+                    <button onClick={() => setIsEditingBio(false)}>Guardar</button>
+                  </div>
+                </div>
+              )}
+            </div>
+
           </div>
         </section>
 
         <section className="profile-buttons">
-          <button
-            type="button"
-            className="edit-button"
-            onClick={() => navigate('/editar-perfil')}>Editar perfil
-          </button>
-
           <button type="button" className="historial-button">
             Historial
           </button>
