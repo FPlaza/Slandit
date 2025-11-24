@@ -2,7 +2,7 @@ import axios from 'axios';
 import { authService } from './authService';
 import type { Subforum, CreateSubforumDto } from '../types/subforum.types';
 
-const API_URL = 'http://localhost:3000/subforums';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const subforumService = {
   async createSubforum(subforumData: CreateSubforumDto): Promise<Subforum> {
@@ -15,12 +15,12 @@ export const subforumService = {
       },
     };
 
-    const response = await axios.post<Subforum>(API_URL, subforumData, config);
+    const response = await axios.post<Subforum>(`${API_URL}/subforums`, subforumData, config);
     return response.data;
   },
 
   async getSubforumById(id: string): Promise<Subforum> {
-    const response = await axios.get<Subforum>(`${API_URL}/${id}`);
+    const response = await axios.get<Subforum>(`${API_URL}/subforums/${id}`);
     return response.data;
   },
 };

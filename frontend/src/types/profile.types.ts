@@ -1,3 +1,5 @@
+import type { SubforumInfo } from "./subforum.types";
+
 export interface Profile {
   _id: string;
   username: string;
@@ -5,6 +7,7 @@ export interface Profile {
   avatarUrl?: string;
   karma: number;
   currency: number;
+  joinedSubforums: SubforumInfo[];
   createdAt: string;
   updatedAt: string;
 }
