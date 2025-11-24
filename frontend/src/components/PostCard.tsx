@@ -1,13 +1,59 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import type { MockPost } from '../mocks/mockData';
-import { mockSubforums } from '../mocks/mockData';
+import { mockSubforums, mockProfile } from '../mocks/mockData';
+import { getVote, setVote, getScoreAdjustmentFor, Vote } from '../utils/voteStorage';
 
 type Props = { post: MockPost };
 
 const PostCard: React.FC<Props> = ({ post }) => {
+  const [vote, setVoteState] = useState<Vote>(null);
+  const [score, setScore] = useState<number>(post.voteScore);
+
+  useEffect(() => {
+    const stored = getVote(post.id, mockProfile.username);
+    setVoteState(stored);
+    setScore(post.voteScore + getScoreAdjustmentFor(stored));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [post.id]);
+
+  const handleUp = () => {
+    const current = getVote(post.id, mockProfile.username);
+    if (current === 'up') {
+      setVote(post.id, mockProfile.username, null);
+      setVoteState(null);
+      setScore((s) => s - 1);
+    } else if (current === 'down') {
+      setVote(post.id, mockProfile.username, 'up');
+      setVoteState('up');
+      setScore((s) => s + 2);
+    } else {
+      setVote(post.id, mockProfile.username, 'up');
+      setVoteState('up');
+      setScore((s) => s + 1);
+    }
+  };
+
+  const handleDown = () => {
+    const current = getVote(post.id, mockProfile.username);
+    if (current === 'down') {
+      setVote(post.id, mockProfile.username, null);
+      setVoteState(null);
+      setScore((s) => s + 1);
+    } else if (current === 'up') {
+      setVote(post.id, mockProfile.username, 'down');
+      setVoteState('down');
+      setScore((s) => s - 2);
+    } else {
+      setVote(post.id, mockProfile.username, 'down');
+      setVoteState('down');
+      setScore((s) => s - 1);
+    }
+  };
+
   return (
     <article style={{
-      border: '1px solid var(--card-border)',
+      border: 'var(--card-border-width) solid var(--card-border)',
       borderRadius: 8,
       padding: 16,
       display: 'flex',
@@ -17,9 +63,9 @@ const PostCard: React.FC<Props> = ({ post }) => {
       alignItems: 'flex-start'
     }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 56 }}>
-        <button style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>▲</button>
-        <strong>{post.voteScore}</strong>
-        <button style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>▼</button>
+        <button className={`vote-btn up ${vote === 'up' ? 'active' : ''}`} aria-pressed={vote === 'up'} onClick={handleUp} aria-label="vote up">▲</button>
+        <strong>{score}</strong>
+        <button className={`vote-btn down ${vote === 'down' ? 'active' : ''}`} aria-pressed={vote === 'down'} onClick={handleDown} aria-label="vote down">▼</button>
       </div>
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 12, color: 'var(--muted-text)', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -34,7 +80,10 @@ const PostCard: React.FC<Props> = ({ post }) => {
             );
           })()}
           <span style={{ marginRight: 8 }}>r/{post.subforum.name}</span>
-          <span>• por {post.author.username}</span>
+          <span>• por </span>
+          <Link to={`/profile/${post.author.username}`} style={{ color: 'var(--muted-text)', textDecoration: 'none', marginLeft: 4 }}>
+            @{post.author.username}
+          </Link>
         </div>
         <h3 style={{ margin: '4px 0 8px', fontSize: 18, color: 'var(--card-title)' }}>{post.title}</h3>
         <p style={{ margin: 0, color: 'var(--card-text)' }}>{post.content.slice(0, 200)}{post.content.length > 200 ? '…' : ''}</p>

@@ -30,13 +30,13 @@ html[data-theme='dark'] {
   --toggle-fg: #111827;
   --header-bg: #332F3B;
   --header-text: #9664FF;
-  --header-border: #4f3f6e;
+  --header-border: rgba(79,63,110,0.45);
   --search-bg: #4c4255;
   --search-input-bg: #2a0999;
   --search-input-fg: #9664FF;
   --sidebar-bg: #332F3B;
   --sidebar-text: #9664FF;
-  --sidebar-border: #4f3f6e;
+  --sidebar-border: rgba(79,63,110,0.45);
   --sidebar-toggle-bg: #4d0cff;
   --sidebar-toggle-fg: #ffffff;
 }
@@ -51,40 +51,112 @@ html[data-theme='light'] {
   --toggle-fg: #fff;
   --header-bg: #ffffff;
   --header-text: #213547;
-  --header-border: #e6e6ea;
+  --header-border: rgba(111,75,255,0.18);
   --search-bg: #f3f4f6;
   --search-input-bg: #ffffff;
   --search-input-fg: #213547;
   --sidebar-bg: #ffffff;
   --sidebar-text: #213547;
-  --sidebar-border: #e6e6ea;
+  --sidebar-border: rgba(111,75,255,0.18);
   --sidebar-toggle-bg: #111827;
   --sidebar-toggle-fg: #ffffff;
+
+  /* borde morado sutil en modo claro para mantener consistencia */
+  --card-border: rgba(111,75,255,0.12);
+  --card-shadow: 0 6px 18px rgba(111,75,255,0.06);
 }
 
 /* Card variables */
 :root {
   --card-bg: var(--bg);
   --card-border: rgba(0,0,0,0.06);
+  --card-border-width: 1px;
+  --card-shadow: 0 6px 18px rgba(0,0,0,0.04);
   --card-title: var(--text);
   --card-text: var(--text);
   --muted-text: rgba(107,114,128,1);
+  /* icon + vote colors (defaults) */
+  --icon-fg: var(--text);
+  --vote-up: #22c55e;
+  --vote-down: #ef4444;
+  --vote-up-bg: rgba(34,197,94,0.12);
+  --vote-up-bg-active: rgba(34,197,94,0.22);
+  --vote-up-shadow: rgba(34,197,94,0.18);
+  --vote-down-bg: rgba(239,68,68,0.12);
+  --vote-down-bg-active: rgba(239,68,68,0.22);
+  --vote-down-shadow: rgba(239,68,68,0.18);
 }
 
 html[data-theme='dark'] {
   --card-bg: #3b3342;
-  --card-border: rgba(255,255,255,0.06);
+  /* más contraste y tono morado para bordes en oscuro */
+  --card-border: rgba(79,63,110,0.35);
+  --card-shadow: 0 6px 18px rgba(0,0,0,0.18);
+  --card-border-width: 3px;
   --card-title: #fff;
   --card-text: rgba(255,255,255,0.9);
   --muted-text: rgba(203,213,225,0.6);
+  --icon-fg: #e9e2ff;
+  --vote-up: #2dd4bf;
+  --vote-down: #fb7185;
+  --vote-up-bg: rgba(45,212,191,0.12);
+  --vote-up-bg-active: rgba(45,212,191,0.22);
+  --vote-up-shadow: rgba(45,212,191,0.18);
+  --vote-down-bg: rgba(251,113,133,0.12);
+  --vote-down-bg-active: rgba(251,113,133,0.22);
+  --vote-down-shadow: rgba(251,113,133,0.18);
 }
 
 html[data-theme='light'] {
   --card-bg: #ffffff;
-  --card-border: rgba(0,0,0,0.06);
+  --card-border: rgba(111,75,255,0.12);
+  --card-border-width: 3px;
   --card-title: #0f172a;
   --card-text: #0f172a;
   --muted-text: rgba(100,116,139,1);
+  --icon-fg: #4b2c8a;
+  --vote-up: #16a34a;
+  --vote-down: #dc2626;
+  --vote-up-bg: rgba(22,163,74,0.08);
+  --vote-up-bg-active: rgba(22,163,74,0.16);
+  --vote-up-shadow: rgba(22,163,74,0.12);
+  --vote-down-bg: rgba(220,38,38,0.08);
+  --vote-down-bg-active: rgba(220,38,38,0.16);
+  --vote-down-shadow: rgba(220,38,38,0.12);
+}
+
+/* Icon button and vote button styles */
+.icon-btn {
+  color: var(--icon-fg);
+}
+
+.vote-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.1rem 0.2rem;
+  transition: transform 0.12s ease, background 0.18s ease, color 0.12s ease;
+  border-radius: 6px;
+}
+.vote-btn.up { color: var(--vote-up); }
+.vote-btn.down { color: var(--vote-down); }
+
+.vote-btn:hover { transform: scale(1.12); }
+.vote-btn.up.active { background: var(--vote-up-bg-active); box-shadow: 0 8px 18px var(--vote-up-shadow); transform: translateY(-1px); }
+.vote-btn.down.active { background: var(--vote-down-bg-active); box-shadow: 0 8px 18px var(--vote-down-shadow); transform: translateY(-1px); }
+.vote-btn.active { animation: vote-press 220ms ease; }
+
+@keyframes vote-press {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+/* Ensure links/icons in header use icon color */
+.header-basic .icon-btn, .header-basic .icon-btn svg {
+  color: var(--icon-fg);
+  fill: currentColor;
 }
 
 a {
@@ -125,9 +197,22 @@ button {
 button:hover {
   border-color: #646cff;
 }
-button:focus,
+/* Only show focus ring when navigated by keyboard (focus-visible).
+   Prevent mouse click showing the white ring; keep accessibility for keyboard users. */
+button:focus {
+  outline: none;
+}
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Specific interactive elements: use subtle focus-visible ring and no outline on mouse click */
+.icon-btn:focus, .vote-btn:focus, .sidebar-link:focus {
+  outline: none;
+}
+.icon-btn:focus-visible, .vote-btn:focus-visible, .sidebar-link:focus-visible {
+  box-shadow: 0 0 0 4px rgba(111,75,255,0.14);
+  border-radius: 8px;
 }
 
 @media (prefers-color-scheme: light) {
