@@ -1,0 +1,11 @@
+{
+  "name": "mongo-seeder",
+  "version": "1.0.0",
+  "main": "seed.js",
+  "scripts": {
+    "start": "node seed.js"
+  },
+  "dependencies": {
+    "mongodb": "^6.0.0"
+  }
+}

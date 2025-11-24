@@ -1,0 +1,100 @@
+.create-post-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.create-post-card {
+    background-color: #694584;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    width: 600px;
+    text-align: center;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 15px;
+    color: white;
+    font-weight: bold;
+}
+
+.create-post-card input[type="text"] {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    box-sizing: border-box;
+    font-size: 1em;
+    background-color: white;
+}
+
+.button-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.cp-button {
+    flex: 1;
+    padding: 12px 0;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.cp-button-text {
+    background-color: #8f56b8;
+    color: black;
+}
+
+.cp-button-image {
+    background-color: #8f56b8;
+    color: black;
+}
+
+.cp-button:hover {
+    background-color: #a66bd2;
+}
+
+.create-post-card textarea {
+    width: 100%;
+    height: 200px;
+    padding: 15px;
+    border-radius: 5px;
+    border: none;
+    box-sizing: border-box;
+    font-size: 1em;
+    resize: none;
+    background-color: white;
+}
+
+.cp-button-submit {
+    background-color: #420170;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    width: 100%;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.cp-button-submit:hover {
+    background-color: #5b0c8f;
+}

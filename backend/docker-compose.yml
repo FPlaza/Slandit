@@ -1,0 +1,67 @@
+name: slandit
+version: "3.9"
+
+services:
+  # 1. PostgreSQL (Autenticación)
+  postgres_db:
+    image: postgres:15
+    container_name: forum_postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: auth_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./postgres-seed:/docker-entrypoint-initdb.d
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d auth_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. MongoDB (Datos del Foro)
+  mongo_db:
+    image: mongo:latest
+    container_name: forum_mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password123
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: |
+        mongosh --host localhost --port 27017 --username root --password password123 --eval "db.adminCommand('ping')"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # 3. Redis (Caché)
+  redis_cache:
+    image: redis:latest
+    container_name: forum_redis
+    ports:
+      - "6379:6379"
+
+  # 4. El Seeder (Poblador de datos)
+  seeder:
+    build: ./mongo-seeder
+    container_name: forum_seeder
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      mongo_db:
+        condition: service_healthy
+    environment:
+      MONGO_URI: mongodb://root:password123@mongo_db:27017/?authSource=admin
+      MONGO_DB_NAME: forum_db
+    restart: "no"
+
+# Volúmenes para persistir los datos
+volumes:
+  postgres-data:
+  mongo-data:
