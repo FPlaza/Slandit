@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import type { MockPost } from '../mocks/mockData';
 import { getVote, setVote, getScoreAdjustmentFor, Vote } from '../utils/voteStorage';
-import { mockProfile } from '../mocks/mockData';
+import { mockProfile, removeMockPost } from '../mocks/mockData';
+import { FiTrash2 } from 'react-icons/fi';
+import ConfirmModal from './ConfirmModal';
 
 type Props = { post: MockPost };
 
@@ -51,8 +53,22 @@ export default function SubforumPostCard({ post }: Props) {
     }
   };
 
+  const handleDelete = () => {
+    setConfirmOpen(true);
+  };
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const onConfirmDelete = () => {
+    removeMockPost(post.id);
+    setConfirmOpen(false);
+  };
+
+  const onCancelDelete = () => setConfirmOpen(false);
+
   return (
-    <article style={{
+    <>
+      <article style={{
       border: 'var(--card-border-width) solid var(--card-border)',
       borderRadius: 12,
       padding: 18,
@@ -69,16 +85,23 @@ export default function SubforumPostCard({ post }: Props) {
       </div>
 
       <div style={{ flex: 1 }}>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 8 }}>
-          <Link to={`/profile/${post.author.username}`} style={{ display: 'inline-block' }}>
-            <img src={post.author.avatarUrl || '/icons/surprisedrudo.png'} alt={post.author.username} style={{ width: 48, height: 48, borderRadius: 999 }} />
-          </Link>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: 14, color: 'var(--muted-text)' }}>
-              por <Link to={`/profile/${post.author.username}`} style={{ color: 'var(--muted-text)', textDecoration: 'none' }}>@{post.author.username}</Link>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 8, justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <Link to={`/profile/${post.author.username}`} style={{ display: 'inline-block' }}>
+              <img src={post.author.avatarUrl || '/icons/surprisedrudo.png'} alt={post.author.username} style={{ width: 48, height: 48, borderRadius: 999 }} />
+            </Link>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ fontSize: 14, color: 'var(--muted-text)' }}>
+                por <Link to={`/profile/${post.author.username}`} style={{ color: 'var(--muted-text)', textDecoration: 'none' }}>@{post.author.username}</Link>
+              </div>
+              <h3 style={{ margin: 0, color: 'var(--card-title)' }}>{post.title}</h3>
             </div>
-            <h3 style={{ margin: 0, color: 'var(--card-title)' }}>{post.title}</h3>
           </div>
+          {post.author.username === mockProfile.username && (
+            <button className="icon-btn delete-btn" onClick={handleDelete} title="Eliminar publicación" style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
+              <FiTrash2 />
+            </button>
+          )}
         </div>
 
         <p style={{ margin: 0, color: 'var(--card-text)', lineHeight: 1.6 }}>{post.content}</p>
@@ -89,6 +112,10 @@ export default function SubforumPostCard({ post }: Props) {
           <span style={{ fontSize: 13 }}>{new Date(post.createdAt).toLocaleString()}</span>
         </div>
       </div>
-    </article>
+      </article>
+      {confirmOpen && (
+        <ConfirmModal open={confirmOpen} title="Eliminar publicación" message="¿Eliminar publicación? Esto no se puede deshacer." onConfirm={onConfirmDelete} onCancel={onCancelDelete} />
+      )}
+    </>
   );
 }

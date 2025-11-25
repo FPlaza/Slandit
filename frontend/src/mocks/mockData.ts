@@ -190,3 +190,59 @@ export const mockSubforums: MockSubforum[] = [
     iconUrl: '/onepiecereddit.png',
   },
 ];
+
+// Helpers para trabajar con los mocks en tiempo de ejecución
+const STORAGE_KEY = 'slandit:mockPosts';
+
+function saveMockPosts() {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(mockPosts));
+  } catch (e) {
+    // ignore
+  }
+}
+
+function loadMockPostsFromStorage() {
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw) as MockPost[];
+    if (!Array.isArray(parsed)) return;
+    // replace contents of mockPosts while keeping the reference
+    mockPosts.splice(0, mockPosts.length, ...parsed);
+  } catch (e) {
+    // ignore parse errors
+  }
+}
+
+export function addMockPost(post: MockPost) {
+  mockPosts.unshift(post);
+  saveMockPosts();
+  try {
+    window.dispatchEvent(new CustomEvent('mockPostsChanged'));
+  } catch (e) {
+    // ignore
+  }
+}
+
+export function makeId(prefix = 'p') {
+  return `${prefix}${Date.now().toString(36)}${Math.floor(Math.random() * 1000)}`;
+}
+
+export function removeMockPost(postId: string) {
+  const idx = mockPosts.findIndex((p) => p.id === postId);
+  if (idx >= 0) {
+    mockPosts.splice(idx, 1);
+    saveMockPosts();
+    try {
+      window.dispatchEvent(new CustomEvent('mockPostsChanged'));
+    } catch (e) {
+      // ignore
+    }
+    return true;
+  }
+  return false;
+}
+
+// Cargar almacenado en localStorage al inicio (si existe)
+loadMockPostsFromStorage();

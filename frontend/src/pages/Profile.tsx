@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { mockProfile, mockPosts, mockProfiles } from '../mocks/mockData';
 import PostCard from '../components/PostCard';
@@ -16,29 +16,21 @@ function Profile() {
 
   const effectiveUsername = (username && (aliasMap[username.toLowerCase()] ?? username)) ?? mockProfile.username;
 
-  const profile = useMemo(() => {
+  const [profile, setProfile] = useState(() => {
     const target = (effectiveUsername || '').toLowerCase();
-
-    // Preferir perfiles 'en la base de datos' (mockProfiles)
     const fromProfiles = mockProfiles.find((u) => {
       const uu = (u.username || '').toLowerCase();
       const ud = (u.displayName || '').toLowerCase();
       return uu === target || ud === target;
     });
     if (fromProfiles) return fromProfiles;
-
-    // Si no hay en mockProfiles, intentar encontrar autor a través de posts
     const found = mockPosts.find((p) => {
       const au = (p.author.username || '').toLowerCase();
       const ad = (p.author.displayName || '').toLowerCase();
       return au === target || ad === target;
     });
     if (found) return found.author;
-
-    // fallback: si es el perfil mock, devolver mockProfile tal cual
     if (effectiveUsername === mockProfile.username) return mockProfile;
-
-    // fallback genérico: crear perfil temporal basado en el parámetro
     return {
       id: 'unknown',
       username: effectiveUsername,
@@ -46,9 +38,9 @@ function Profile() {
       avatarUrl: '/icons/surprisedrudo.png',
       bio: '',
     };
-  }, [effectiveUsername]);
+  });
 
-  const posts = useMemo(() => {
+  const [posts, setPosts] = useState(() => {
     const target = (effectiveUsername || '').toLowerCase();
     return mockPosts
       .filter((p) => {
@@ -57,6 +49,42 @@ function Profile() {
         return au === target || ad === target;
       })
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  });
+
+  useEffect(() => {
+    const compute = () => {
+      const target = (effectiveUsername || '').toLowerCase();
+      const fromProfiles = mockProfiles.find((u) => {
+        const uu = (u.username || '').toLowerCase();
+        const ud = (u.displayName || '').toLowerCase();
+        return uu === target || ud === target;
+      });
+      if (fromProfiles) {
+        setProfile(fromProfiles);
+      } else {
+        const found = mockPosts.find((p) => {
+          const au = (p.author.username || '').toLowerCase();
+          const ad = (p.author.displayName || '').toLowerCase();
+          return au === target || ad === target;
+        });
+        if (found) setProfile(found.author);
+        else if (effectiveUsername === mockProfile.username) setProfile(mockProfile);
+        else setProfile({ id: 'unknown', username: effectiveUsername, displayName: effectiveUsername, avatarUrl: '/icons/surprisedrudo.png', bio: '' });
+      }
+
+      const newPosts = mockPosts
+        .filter((p) => {
+          const au = (p.author.username || '').toLowerCase();
+          const ad = (p.author.displayName || '').toLowerCase();
+          return au === target || ad === target;
+        })
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setPosts(newPosts);
+    };
+
+    compute();
+    window.addEventListener('mockPostsChanged', compute as EventListener);
+    return () => window.removeEventListener('mockPostsChanged', compute as EventListener);
   }, [effectiveUsername]);
 
   return (
