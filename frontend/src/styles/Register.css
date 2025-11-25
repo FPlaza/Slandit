@@ -27,6 +27,7 @@
 }
 
 .register-card input[type="text"],
+.register-card input[type="email"],
 .register-card input[type="password"] {
     width: 100%;
     padding: 10px 15px 10px 40px;
