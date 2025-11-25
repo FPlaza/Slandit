@@ -6,6 +6,9 @@ import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ProfilesService } from 'src/profiles/profiles.service';
 import * as bcrypt from 'bcrypt';
+import { SubforumsService } from 'src/subforums/subforums.service';
+
+const SLANDIT_SUBFORUM_ID = '6924f32241770dc7a6f0f64b';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +16,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly profilesService: ProfilesService,
+    private readonly subforumsService: SubforumsService,
   ) { }
 
   async register(createUserDto: CreateUserDto) {
@@ -22,6 +26,12 @@ export class AuthService {
       newUser.id,
       newUser.username,
     );
+
+    try {
+      await this.subforumsService.joinSubforum(SLANDIT_SUBFORUM_ID, newUser.id);
+    } catch (error) {
+      console.warn(`No se pudo unir al usuario al subforo default: ${error.message}`);
+    }
 
     const payload = {
       sub: newUser.id,
