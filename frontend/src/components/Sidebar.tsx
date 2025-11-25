@@ -2,6 +2,7 @@ import './Sidebar.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { profileService } from '../services/profileService';
+import { authService } from '../services/authService';
 import type { SubforumInfo } from '../types/subforum.types';
 
 export default function Sidebar() {
@@ -9,7 +10,12 @@ export default function Sidebar() {
   const [joinedSubforums, setJoinedSubforums] = useState<SubforumInfo[]>([]);
   const navigate = useNavigate();
 
+  const user = authService.getUser(); // Detectar si el usuario está loggeado
+
   useEffect(() => {
+    // Si NO hay usuario, no intentes cargar subforos
+    if (!user) return;
+
     async function loadSubforums() {
       try {
         const profile = await profileService.getMyProfile();
@@ -20,7 +26,7 @@ export default function Sidebar() {
     }
 
     loadSubforums();
-  }, []);
+  }, [user]);
 
   return (
     <div
@@ -37,11 +43,18 @@ export default function Sidebar() {
       <nav className={`sidebar${open ? ' open' : ''}`}>
         {open && (
           <ul>
-            {joinedSubforums.length === 0 ? (
+            {!user ? (
+              // ⚠ Usuario NO loggeado
+              <p style={{ padding: '12px', opacity: 0.75 }}>
+                Para ver tus subforos, inicia sesión.
+              </p>
+            ) : joinedSubforums.length === 0 ? (
+              // Usuario loggeado pero sin subforos
               <p style={{ padding: '12px', opacity: 0.6 }}>
                 No estás suscrito a ningún subforo.
               </p>
             ) : (
+              // Usuario loggeado con subforos
               joinedSubforums.map((sf) => (
                 <li key={sf._id}>
                   <button
