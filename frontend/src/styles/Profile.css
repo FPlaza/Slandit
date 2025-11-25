@@ -172,3 +172,57 @@
     justify-content: flex-end;
     gap: 10px;
 }
+
+/* Nuevo contenedor para alinear la info y las divisas */
+.profile-details-wrapper {
+    display: flex;
+    justify-content: space-between;
+    /* Espacio entre la información y las divisas */
+    align-items: flex-start;
+    /* Alinear arriba */
+    flex-grow: 1;
+    /* Ocupar el espacio restante en el profile-card */
+}
+
+/* Sección de Divisas */
+.currency-section {
+    padding: 10px 15px;
+    border-radius: 8px;
+    background-color: var(--highlight-bg, #f0f0f0);
+    /* Color de fondo sutil */
+    border: 1px solid var(--card-border, #ddd);
+    text-align: center;
+    max-width: 150px;
+    min-width: 120px;
+}
+
+.currency-section h2 {
+    font-size: 14px;
+    margin: 0 0 5px 0;
+    color: var(--muted-text, #666);
+    font-weight: 500;
+}
+
+.currency-section strong {
+    font-size: 20px;
+    color: var(--primary-color, #9f4bee);
+    font-weight: 700;
+}
+
+/* Ajuste para que la info del usuario no ocupe todo el ancho */
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-basis: 70%;
+    /* Le da un 70% del espacio al contenido de la bio/nombre */
+}
+
+.profile-card {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    padding: 20px;
+    border-radius: 12px;
+    background: var(--card-bg);
+}

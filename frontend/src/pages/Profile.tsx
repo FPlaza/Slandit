@@ -1,76 +1,58 @@
-import { useMemo } from 'react';
-import { useParams } from 'react-router-dom';
-import { mockProfile, mockPosts, mockProfiles } from '../mocks/mockData';
+import { useEffect, useState } from 'react';
+import { profileService } from '../services/profileService';
 import PostCard from '../components/PostCard';
-import { useState } from 'react';
+import { mockPosts } from '../mocks/mockData';
 import '../styles/Profile.css';
 
 function Profile() {
-  const { username } = useParams();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const aliasMap: Record<string, string> = {
-    usuario: mockProfile.username,
-    branquito: mockProfile.username,
-    branco: mockProfile.username,
-  };
-
-  const effectiveUsername = (username && (aliasMap[username.toLowerCase()] ?? username)) ?? mockProfile.username;
-
-  const profile = useMemo(() => {
-    const target = (effectiveUsername || '').toLowerCase();
-
-    // Preferir perfiles 'en la base de datos' (mockProfiles)
-    const fromProfiles = mockProfiles.find((u) => {
-      const uu = (u.username || '').toLowerCase();
-      const ud = (u.displayName || '').toLowerCase();
-      return uu === target || ud === target;
-    });
-    if (fromProfiles) return fromProfiles;
-
-    // Si no hay en mockProfiles, intentar encontrar autor a través de posts
-    const found = mockPosts.find((p) => {
-      const au = (p.author.username || '').toLowerCase();
-      const ad = (p.author.displayName || '').toLowerCase();
-      return au === target || ad === target;
-    });
-    if (found) return found.author;
-
-    // fallback: si es el perfil mock, devolver mockProfile tal cual
-    if (effectiveUsername === mockProfile.username) return mockProfile;
-
-    // fallback genérico: crear perfil temporal basado en el parámetro
-    return {
-      id: 'unknown',
-      username: effectiveUsername,
-      displayName: effectiveUsername,
-      avatarUrl: '/icons/surprisedrudo.png',
-      bio: '',
-    };
-  }, [effectiveUsername]);
-
+  // Estado para edición
   const [isEditingAvatar, setIsEditingAvatar] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
 
-  const [newAvatar, setNewAvatar] = useState(profile.avatarUrl);
-  const [newBio, setNewBio] = useState(profile.bio);
+  const [newAvatar, setNewAvatar] = useState('');
+  const [newBio, setNewBio] = useState('');
 
+  // Cargar MI perfil real
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const p = await profileService.getMyProfile();
+        setProfile(p);
+        setNewAvatar(p.avatarUrl || '');
+        setNewBio(p.bio || '');
+      } catch (err) {
+        console.error("Error cargando perfil:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-  const posts = useMemo(() => {
-    const target = (effectiveUsername || '').toLowerCase();
-    return mockPosts
-      .filter((p) => {
-        const au = (p.author.username || '').toLowerCase();
-        const ad = (p.author.displayName || '').toLowerCase();
-        return au === target || ad === target;
-      })
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [effectiveUsername]);
+    loadProfile();
+  }, []);
+
+  if (loading) {
+    return <div className="loading">Cargando perfil...</div>;
+  }
+
+  if (!profile) {
+    return <div className="error">No se pudo cargar tu perfil.</div>;
+  }
+
+  // Posts mock: opcional
+  const posts = mockPosts.filter(
+    (p) => p.author.username.toLowerCase() === profile.username.toLowerCase()
+  );
 
   return (
     <main className="profile-main">
       <div className="profile-wrapper">
 
+        {/* CARD DEL PERFIL */}
         <section className="profile-card">
+
           <div className="avatar-container">
             <img
               src={newAvatar || '/icons/surprisedrudo.png'}
@@ -98,57 +80,89 @@ function Profile() {
 
                 <div className="popup-actions">
                   <button onClick={() => setIsEditingAvatar(false)}>Cancelar</button>
-                  <button onClick={() => setIsEditingAvatar(false)}>Guardar</button>
+                  <button
+                    onClick={async () => {
+                      await profileService.updateMyProfile({ avatarUrl: newAvatar });
+                      setProfile({ ...profile, avatarUrl: newAvatar });
+                      setIsEditingAvatar(false);
+                    }}
+                  >
+                    Guardar
+                  </button>
                 </div>
               </div>
             )}
           </div>
 
-          <div className="profile-info">
-            <h2 className="profile-username">@{profile.username}</h2>
-            <div className="bio-container">
-              {!isEditingBio ? (
-                <>
-                  <p className="profile-bio">{newBio || 'Sin descripción.'}</p>
+          {/* EL ENVOLTORIO FLEX PARA INFO + DIVISAS */}
+          <div className="profile-details-wrapper">
 
-                  <button
-                    className="bio-edit-btn"
-                    onClick={() => setIsEditingBio(true)}
-                  >
-                    ✏️
-                  </button>
-                </>
-              ) : (
-                <div className="bio-editor">
-                  <textarea
-                    value={newBio}
-                    onChange={(e) => setNewBio(e.target.value)}
-                  />
+            <div className="profile-info">
+              <h2 className="profile-username">@{profile.username}</h2>
 
-                  <div className="bio-actions">
-                    <button onClick={() => setIsEditingBio(false)}>Cancelar</button>
-                    <button onClick={() => setIsEditingBio(false)}>Guardar</button>
+              <div className="bio-container">
+                {!isEditingBio ? (
+                  <>
+                    <p className="profile-bio">{newBio || 'Sin descripción.'}</p>
+
+                    <button
+                      className="bio-edit-btn"
+                      onClick={() => setIsEditingBio(true)}
+                    >
+                      ✏️
+                    </button>
+                  </>
+                ) : (
+                  <div className="bio-editor">
+                    <textarea
+                      value={newBio}
+                      onChange={(e) => setNewBio(e.target.value)}
+                    />
+
+                    <div className="bio-actions">
+                      <button onClick={() => setIsEditingBio(false)}>Cancelar</button>
+                      <button
+                        onClick={async () => {
+                          await profileService.updateMyProfile({ bio: newBio });
+                          setProfile({ ...profile, bio: newBio });
+                          setIsEditingBio(false);
+                        }}
+                      >
+                        Guardar
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
-          </div>
-        </section>
+            {/* SECCIÓN DE DIVISAS: DEBE IR AQUÍ para estar AL LADO de profile-info */}
+            <section className="currency-section">
+              <div className="currency-item">
+                <h2>Divisas Actuales</h2>
+                {/* Corregir posible error: usar optional chaining o valor por defecto */}
+                <strong>{profile.currency || '0'}</strong>
+              </div>
+            </section>
 
+          </div> {/* CIERRE de .profile-details-wrapper */}
+
+        </section> {/* CIERRE de .profile-card */}
+
+        {/* BOTONES (Fuera de profile-card, como estaba) */}
         <section className="profile-buttons">
           <button type="button" className="historial-button">
             Historial
           </button>
         </section>
 
-
+        {/* POSTS */}
         <section>
           <h3 className="posts-title">Publicaciones recientes</h3>
 
           {posts.length === 0 ? (
             <div className="posts-empty">
-              No hay publicaciones públicas de este usuario (mock).
+              No hay publicaciones públicas.
             </div>
           ) : (
             <div className="posts-list">
@@ -160,9 +174,8 @@ function Profile() {
         </section>
 
       </div>
-    </main>
+    </main >
   );
-
 }
 
 export default Profile;
