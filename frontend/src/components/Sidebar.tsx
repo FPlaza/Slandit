@@ -11,31 +11,45 @@ export default function Sidebar() {
   const [user, setUser] = useState<any>(authService.getUser());
   const navigate = useNavigate();
 
-  /** 🔥 Detecta login/logout automáticamente */
-  useEffect(() => {
-    const updateUser = () => {
-      const u = authService.getUser();
-      setUser(u);
+  const loadSubforums = async () => {
+    const token = authService.getToken();
+    if (!token) {
+      setJoinedSubforums([]);
+      return;
+    }
 
-      // Si hay usuario, recargar subforos
-      if (u) loadSubforums();
-      else setJoinedSubforums([]);
-    };
-
-    window.addEventListener("auth-changed", updateUser);
-
-    return () => window.removeEventListener("auth-changed", updateUser);
-  }, []);
-
-  /** 🔄 Cargar subforos del usuario */
-  async function loadSubforums() {
     try {
       const profile = await profileService.getMyProfile();
       setJoinedSubforums(profile.joinedSubforums || []);
     } catch (err) {
-      console.error("Error cargando subforos del usuario:", err);
+      console.error("Error cargando subforos:", err);
+      // Si falla (ej: token expirado), podríamos hacer logout automático
+      // authService.logout(); 
     }
-  }
+  };
+
+  /** 🔥 Detecta login/logout automáticamente */
+  useEffect(() => {
+    // 1. Cargar al inicio (si hay usuario/token)
+    loadSubforums();
+
+    // 2. Suscribirse a cambios de login/logout
+    const handleAuthChange = () => {
+      const currentUser = authService.getUser();
+      setUser(currentUser);
+      
+      // Si se logueó, cargamos. Si salió, limpiamos.
+      if (currentUser) {
+        loadSubforums();
+      } else {
+        setJoinedSubforums([]);
+      }
+    };
+
+    window.addEventListener("auth-changed", handleAuthChange);
+    return () => window.removeEventListener("auth-changed", handleAuthChange);
+  }, []);
+
 
   /** 🚪 Logout */
   const handleLogout = () => {
