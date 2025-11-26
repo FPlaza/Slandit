@@ -1,53 +1,80 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import type { MockPost } from '../mocks/mockData';
-import { getVote, setVote, getScoreAdjustmentFor, Vote } from '../utils/voteStorage';
-import { mockProfile } from '../mocks/mockData';
+import type { Post } from '../types/post.types';
+import { postService } from '../services/postService';
+import { authService } from '../services/authService';
 
-type Props = { post: MockPost };
+type Props = { post: Post };
+
+type VoteStatus = 'up' | 'down' | null;
 
 export default function SubforumPostCard({ post }: Props) {
-  const [vote, setVoteState] = useState<Vote>(null);
   const [score, setScore] = useState<number>(post.voteScore);
+  const [userVote, setUserVote] = useState<VoteStatus>(null);
+  
+  // Obtenemos el usuario actual para saber si ya votó
+  const currentUser = authService.getUser();
 
+  // 2. Calcular estado inicial basado en datos reales de Mongo
   useEffect(() => {
-    const stored = getVote(post.id, mockProfile.username);
-    setVoteState(stored);
-    setScore(post.voteScore + getScoreAdjustmentFor(stored));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [post.id]);
+    if (!currentUser) {
+      setUserVote(null);
+      return;
+    }
 
-  const handleUp = () => {
-    const current = getVote(post.id, mockProfile.username);
-    if (current === 'up') {
-      setVote(post.id, mockProfile.username, null);
-      setVoteState(null);
-      setScore((s) => s - 1);
-    } else if (current === 'down') {
-      setVote(post.id, mockProfile.username, 'up');
-      setVoteState('up');
-      setScore((s) => s + 2);
+    if (post.upvotedBy.includes(currentUser.id)) {
+      setUserVote('up');
+    } else if (post.downvotedBy.includes(currentUser.id)) {
+      setUserVote('down');
     } else {
-      setVote(post.id, mockProfile.username, 'up');
-      setVoteState('up');
-      setScore((s) => s + 1);
+      setUserVote(null);
+    }
+    
+    // Actualizamos el score por si el post prop cambió
+    setScore(post.voteScore);
+  }, [post, currentUser]);
+
+  // 3. Manejadores de Voto conectados a la API
+  const handleUp = async () => {
+    if (!currentUser) return alert("Inicia sesión para votar");
+
+    // Optimistic UI: Actualizamos visualmente antes de que el servidor responda
+    // (Opcional, pero se siente más rápido)
+    const previousVote = userVote;
+    const previousScore = score;
+    
+    try {
+      // Llamamos al backend
+      const updatedPost = await postService.toggleUpvote(post._id);
+      
+      // El backend nos devuelve el post actualizado con el cálculo exacto
+      setScore(updatedPost.voteScore);
+      
+      // Recalculamos el estado del botón basado en la respuesta real
+      if (updatedPost.upvotedBy.includes(currentUser.id)) setUserVote('up');
+      else setUserVote(null);
+
+    } catch (error) {
+      console.error("Error votando:", error);
+      // Si falla, revertimos (Rollback)
+      setUserVote(previousVote);
+      setScore(previousScore);
     }
   };
 
-  const handleDown = () => {
-    const current = getVote(post.id, mockProfile.username);
-    if (current === 'down') {
-      setVote(post.id, mockProfile.username, null);
-      setVoteState(null);
-      setScore((s) => s + 1);
-    } else if (current === 'up') {
-      setVote(post.id, mockProfile.username, 'down');
-      setVoteState('down');
-      setScore((s) => s - 2);
-    } else {
-      setVote(post.id, mockProfile.username, 'down');
-      setVoteState('down');
-      setScore((s) => s - 1);
+  const handleDown = async () => {
+    if (!currentUser) return alert("Inicia sesión para votar");
+
+    try {
+      const updatedPost = await postService.toggleDownvote(post._id);
+      
+      setScore(updatedPost.voteScore);
+      
+      if (updatedPost.downvotedBy.includes(currentUser.id)) setUserVote('down');
+      else setUserVote(null);
+
+    } catch (error) {
+      console.error("Error votando:", error);
     }
   };
 
@@ -62,31 +89,68 @@ export default function SubforumPostCard({ post }: Props) {
       alignItems: 'flex-start',
       boxShadow: 'var(--card-shadow)'
     }}>
-      <div style={{ width: 72, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <button className={`vote-btn up ${vote === 'up' ? 'active' : ''}`} aria-pressed={vote === 'up'} onClick={handleUp} aria-label="vote up">▲</button>
-        <strong style={{ margin: '8px 0' }}>{score}</strong>
-        <button className={`vote-btn down ${vote === 'down' ? 'active' : ''}`} aria-pressed={vote === 'down'} onClick={handleDown} aria-label="vote down">▼</button>
+      {/* SECCIÓN DE VOTOS */}
+      <div style={{ width: 40, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <button 
+          className={`vote-btn up ${userVote === 'up' ? 'active' : ''}`} 
+          aria-pressed={userVote === 'up'} 
+          onClick={handleUp} 
+          aria-label="vote up"
+          style={{ cursor: 'pointer', background: 'none', border: 'none', fontSize: '1.2rem' }}
+        >
+          ▲
+        </button>
+        
+        <strong style={{ margin: '4px 0' }}>{score}</strong>
+        
+        <button 
+          className={`vote-btn down ${userVote === 'down' ? 'active' : ''}`} 
+          aria-pressed={userVote === 'down'} 
+          onClick={handleDown} 
+          aria-label="vote down"
+          style={{ cursor: 'pointer', background: 'none', border: 'none', fontSize: '1.2rem' }}
+        >
+          ▼
+        </button>
       </div>
 
+      {/* CONTENIDO DEL POST */}
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 8 }}>
-          <Link to={`/profile/${post.author.username}`} style={{ display: 'inline-block' }}>
-            <img src={post.author.avatarUrl || '/icons/surprisedrudo.png'} alt={post.author.username} style={{ width: 48, height: 48, borderRadius: 999 }} />
+          
+          {/* Avatar del Autor (Usando authorId populado) */}
+          <Link to={`/profile/${post.authorId.username}`} style={{ display: 'inline-block' }}>
+            <img 
+              src={post.authorId.avatarUrl || '/icons/surprisedrudo.png'} 
+              alt={post.authorId.username} 
+              style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} 
+            />
           </Link>
+
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ fontSize: 14, color: 'var(--muted-text)' }}>
-              por <Link to={`/profile/${post.author.username}`} style={{ color: 'var(--muted-text)', textDecoration: 'none' }}>@{post.author.username}</Link>
+              {/* Link al Perfil */}
+              por <Link to={`/profile/${post.authorId.username}`} style={{ color: 'var(--muted-text)', textDecoration: 'none', fontWeight: 500 }}>
+                @{post.authorId.username}
+              </Link>
             </div>
-            <h3 style={{ margin: 0, color: 'var(--card-title)' }}>{post.title}</h3>
+            
+            {/* Título (Link al detalle del post) */}
+            <Link to={`/posts/${post._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <h3 style={{ margin: 0, color: 'var(--card-title)', fontSize: '1.1rem' }}>{post.title}</h3>
+            </Link>
           </div>
         </div>
 
-        <p style={{ margin: 0, color: 'var(--card-text)', lineHeight: 1.6 }}>{post.content}</p>
+        <p style={{ margin: '8px 0', color: 'var(--card-text)', lineHeight: 1.5 }}>{post.content}</p>
 
-        <div style={{ marginTop: 12, display: 'flex', gap: 12, alignItems: 'center', color: 'var(--muted-text)' }}>
-          <span>{post.commentCount} comentarios</span>
+        {/* Footer del Post */}
+        <div style={{ marginTop: 12, display: 'flex', gap: 12, alignItems: 'center', color: 'var(--muted-text)', fontSize: 13 }}>
+          <Link to={`/posts/${post._id}`} style={{ color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+             💬 <span>{post.commentCount} comentarios</span>
+          </Link>
           <span>•</span>
-          <span style={{ fontSize: 13 }}>{new Date(post.createdAt).toLocaleString()}</span>
+          <span>{new Date(post.createdAt).toLocaleString()}</span>
         </div>
       </div>
     </article>

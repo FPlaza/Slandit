@@ -90,7 +90,7 @@ export default function Sidebar() {
                   <li key={sf._id}>
                     <button
                       className="sidebar-link"
-                      onClick={() => navigate(`/subforum/${sf.name}`)}
+                      onClick={() => navigate(`/subforum/${sf._id}`)}
                       title={sf.displayName}
                       aria-label={sf.displayName}
                     >
