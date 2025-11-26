@@ -11,43 +11,44 @@ function Feed() {
   useEffect(() => {
     let mounted = true;
 
-    async function load() {
+    const load = async () => {
       try {
-        let data: Post[] = [];
+        // Resetear a 'cargando' visualmente cuando cambiamos de usuario
+        if (mounted) setPosts(null); 
         
+        let data: Post[] = [];
         const token = authService.getToken();
 
         if (token) {
-           // A. Usuario Logueado: Cargar Feed Personalizado (Suscripciones)
+           // A. Logueado
            const myFeed = await postService.getMyFeed();
-           
-           // Si el feed personalizado viene vacío (no sigue a nadie),
-           // podrías optar por cargar el Hot Feed como fallback.
            if (myFeed && myFeed.length > 0) {
              data = myFeed;
            } else {
-             // Fallback opcional: Hot Posts si no sigue a nadie
              data = await postService.getHotPosts();
            }
-
         } else {
-           // B. Invitado: Cargar Hot Posts (Redis)
+           // B. Invitado
            data = await postService.getHotPosts();
         }
 
-        if (mounted) {
-           setPosts(data);
-        }
+        if (mounted) setPosts(data);
       } catch (err) {
         console.error("Error cargando feed:", err);
         if (mounted) setPosts([]);
       }
-    }
+    };
 
+    // Cargar al montar
     load();
+
+    // Escuchar evento
+    const handleAuthChange = () => load();
+    window.addEventListener('auth-changed', handleAuthChange);
 
     return () => {
       mounted = false;
+      window.removeEventListener('auth-changed', handleAuthChange);
     };
   }, []);
 
