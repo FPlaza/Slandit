@@ -119,7 +119,7 @@ export default function SubforumPostCard({ post }: Props) {
         <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 8 }}>
           
           {/* Avatar del Autor (Usando authorId populado) */}
-          <Link to={`/profile/${post.authorId.username}`} style={{ display: 'inline-block' }}>
+          <Link to={`/guest-profile/${post.authorId.username}`} style={{ display: 'inline-block' }}>
             <img 
               src={post.authorId.avatarUrl || '/icons/surprisedrudo.png'} 
               alt={post.authorId.username} 
@@ -130,7 +130,7 @@ export default function SubforumPostCard({ post }: Props) {
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ fontSize: 14, color: 'var(--muted-text)' }}>
               {/* Link al Perfil */}
-              por <Link to={`/profile/${post.authorId.username}`} style={{ color: 'var(--muted-text)', textDecoration: 'none', fontWeight: 500 }}>
+              por <Link to={`/guest-profile/${post.authorId.username}`} style={{ color: 'var(--muted-text)', textDecoration: 'none', fontWeight: 500 }}>
                 @{post.authorId.username}
               </Link>
             </div>
