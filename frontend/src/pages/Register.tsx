@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
 import "../styles/Register.css";
 
@@ -106,8 +106,8 @@ function Register() {
             </div>
 
             <div className="register-links">
-                <a onClick={() => navigate("/login")}>¿Ya tienes cuenta?</a>
-                <a onClick={() => navigate("/")}>Permanecer desconectado</a>
+                <Link to="/login">¿Ya tienes cuenta?</Link>
+                <Link to="/">Permanecer desconectado</Link>
             </div>
         </div>
     );

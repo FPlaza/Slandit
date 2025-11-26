@@ -2,7 +2,7 @@ import '../styles/Login.css';
 import { FaUser, FaLock } from 'react-icons/fa';
 import { useState } from 'react';
 import { authService } from '../services/authService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Login() {
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
@@ -22,6 +22,7 @@ function Login() {
       }
 
     } catch (err: any) {
+      // Manejo básico de error, podrías mostrar err.response.data.message si existe
       setError("Credenciales incorrectas");
     }
   };
@@ -69,8 +70,10 @@ function Login() {
       </div>
 
       <div className="login-links">
-        <a href="#">¿No tienes una cuenta aún?</a>
-        <a href="#">Permanecer desconectado</a>
+        {/* 2. Cambiamos los <a> por <Link> apuntando a tus rutas definidas */}
+        <Link to="/register">¿No tienes una cuenta aún?</Link>
+        
+        <Link to="/">Permanecer desconectado</Link>
       </div>
     </div>
   );
