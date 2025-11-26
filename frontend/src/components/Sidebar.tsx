@@ -93,25 +93,16 @@ export default function Sidebar() {
 
             {/* 🚪 BOTÓN DE CERRAR SESIÓN (solo si hay usuario) */}
             {user && (
-              <div style={{ padding: '12px', marginTop: 'auto' }}>
+              <div className="logout-container">
                 <button
                   className="logout-btn"
                   onClick={handleLogout}
-                  style={{
-                    width: '100%',
-                    padding: '10px 14px',
-                    borderRadius: 8,
-                    background: '#d9534f',
-                    border: 'none',
-                    color: 'white',
-                    cursor: 'pointer',
-                    fontSize: '14px'
-                  }}
                 >
                   Cerrar sesión
                 </button>
               </div>
             )}
+
           </>
         )}
       </nav>

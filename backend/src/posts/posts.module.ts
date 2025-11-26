@@ -5,6 +5,7 @@ import { PostsController } from './posts.controller';
 import { Post, PostSchema } from './entities/post.schema';
 import { ProfilesModule } from 'src/profiles/profiles.module';
 import { SubforumsModule } from 'src/subforums/subforums.module';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 
 @Module({
@@ -15,6 +16,7 @@ import { SubforumsModule } from 'src/subforums/subforums.module';
     
     ProfilesModule,
     SubforumsModule,
+    NotificationsModule
   ],
   controllers: [PostsController],
   providers: [PostsService],

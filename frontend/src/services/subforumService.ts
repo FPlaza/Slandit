@@ -23,4 +23,34 @@ export const subforumService = {
     const response = await axios.get<Subforum>(`${API_URL}/subforums/${id}`);
     return response.data;
   },
+
+  async joinSubforum(subforumId: string): Promise<{ message: string }> {
+    const token = authService.getToken();
+    if (!token) throw new Error('No hay token');
+
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+    
+    const response = await axios.post<{ message: string }>(
+      `${API_URL}/subforums/${subforumId}/join`, 
+      {}, 
+      config
+    );
+    
+    return response.data;
+  },
+
+  async leaveSubforum(subforumId: string): Promise<{ message: string }> {
+    const token = authService.getToken();
+    if (!token) throw new Error('No hay token');
+
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+
+    const response = await axios.post<{ message: string }>(
+      `${API_URL}/subforums/${subforumId}/leave`, 
+      {}, 
+      config
+    );
+    
+    return response.data;
+  }
 };

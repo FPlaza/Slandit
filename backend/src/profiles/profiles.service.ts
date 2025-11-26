@@ -3,12 +3,17 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Profile, ProfileDocument } from './entities/profile.schema';
 import { Model } from 'mongoose';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { NotificationType } from 'src/notifications/schemas/notification.schema';
 
 @Injectable()
 export class ProfilesService {
+    private readonly SUBFORUM_COST = 500;
+
     constructor(
         @InjectModel(Profile.name)
         private profileModel: Model<ProfileDocument>,
+        private readonly notificationsService: NotificationsService,
     ) { }
 
     async findProfileById(id: string): Promise<ProfileDocument> {
@@ -71,4 +76,33 @@ export class ProfilesService {
 
         return profile;
     }
+
+    async addCurrency(userId: string, amount: number): Promise<ProfileDocument> {
+    const profile = await this.profileModel.findById(userId);
+    
+    if (!profile) throw new NotFoundException('Perfil no encontrado');
+
+    const previousCurrency = profile.currency;
+    const newCurrency = previousCurrency + amount;
+
+    
+    profile.currency = newCurrency;
+
+    
+    
+    
+    if (previousCurrency < this.SUBFORUM_COST && newCurrency >= this.SUBFORUM_COST) {
+      
+      await this.notificationsService.create({
+        recipientId: userId,
+        triggerUserId: null, 
+        type: NotificationType.SUBFORUM_UNLOCKED,
+        content: `¡Felicidades! Has alcanzado ${newCurrency} monedas. Ahora tienes permiso para crear tus propios Subforos.`,
+        resourceId: null, 
+        resourceType: 'System'
+      });
+    }
+
+    return profile.save();
+  }
 }

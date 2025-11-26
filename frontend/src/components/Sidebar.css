@@ -7,20 +7,24 @@
   background: var(--sidebar-bg);
   color: var(--sidebar-text);
   overflow-x: hidden;
-  transition: width 0.18s cubic-bezier(.4,0,.2,1);
+  transition: width 0.18s cubic-bezier(.4, 0, .2, 1);
   z-index: 999;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.10);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.10);
   border-right: 5px solid var(--sidebar-border);
   padding-top: 1rem;
+
+  /* 🔥 CORRECCIÓN: CENTRADO + layout en columna */
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .sidebar.open {
-  width: 120px; /* al abrir mostramos iconos grandes y llamativos */
+  width: 120px;
 }
 
+/* Toggle */
 .sidebar-toggle {
   position: fixed;
   top: 72px;
@@ -33,25 +37,33 @@
   border-radius: 0 8px 8px 0;
   padding: 0.25rem 0.75rem;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  transition: left 0.18s cubic-bezier(.4,0,.2,1), transform 0.12s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: left 0.18s cubic-bezier(.4, 0, .2, 1), transform 0.12s ease;
 }
-.sidebar.open ~ .sidebar-toggle {
-  left: 110px; /* se posiciona justo después de la sidebar abierta */
+
+.sidebar.open~.sidebar-toggle {
+  left: 110px;
 }
-.sidebar:not(.open) ~ .sidebar-toggle {
+
+.sidebar:not(.open)~.sidebar-toggle {
   left: 35px;
 }
 
+/* Lista de subforos */
 .sidebar ul {
   list-style: none;
   padding: 0;
   margin: 0;
+
   width: 100%;
+  flex: 1;
+  /* 🔥 Esto permite empujar el botón hacia abajo automáticamente */
+
   display: flex;
   flex-direction: column;
   gap: 12px;
   align-items: center;
+  justify-content: flex-start;
 }
 
 .sidebar ul li {
@@ -60,28 +72,31 @@
   justify-content: center;
 }
 
+/* Botones de subforos */
 .sidebar-link {
   background: none;
   border: none;
   padding: 0;
   width: 100%;
   cursor: pointer;
+
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .sidebar-link:hover {
-  background: rgba(88,255,138,0.04);
+  background: rgba(88, 255, 138, 0.04);
   border-radius: 8px;
 }
 
+/* Iconos */
 .sidebar-icon {
   width: 36px;
   height: 36px;
   object-fit: cover;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.14);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
   transition: width 0.18s ease, height 0.18s ease, transform 0.12s ease;
 }
 
@@ -89,6 +104,35 @@
   width: 64px;
   height: 64px;
 }
+
 .sidebar-link:hover .sidebar-icon {
   transform: scale(1.08);
+}
+
+/* 🔥 CONTENEDOR del botón Cerrar sesión */
+.logout-container {
+  width: 100%;
+  padding: 12px 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 🔥 Estilo del botón Cerrar sesión */
+.logout-btn {
+  background: #d9534f;
+  color: white;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s ease;
+  margin: 10px;
+  margin-bottom: 30px;
+}
+
+.logout-btn:hover {
+  background: #c9302c;
 }
