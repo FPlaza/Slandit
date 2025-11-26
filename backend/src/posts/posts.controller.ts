@@ -24,6 +24,17 @@ export class PostsController {
     return this.postsService.createPost(createPostDto, authorId);
   }
 
+  @Get('hot') // Endpoint: GET /posts/hot
+  async getHotPosts() {
+    // No tiene @UseGuards, así que cualquiera puede verlo
+    return this.postsService.getHotPosts();
+  }
+
+  @Get('recent')
+  async findRecent() {
+    return this.postsService.findRecent();
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @Get('feed') // GET /posts/feed
   async getFeed(@Request() req) {
@@ -63,10 +74,7 @@ export class PostsController {
     return this.postsService.findPostById(id);
   }
 
-  @Get('recent')
-  async findRecent() {
-    return this.postsService.findRecent();
-  }
+  
 
 
 }

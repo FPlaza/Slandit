@@ -1,5 +1,4 @@
-
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PostDocument, Post } from './entities/post.schema';
@@ -7,6 +6,8 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { NotificationType } from 'src/notifications/schemas/notification.schema';
 import { ProfilesService } from 'src/profiles/profiles.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { type Cache } from 'cache-manager';
 
 @Injectable()
 export class PostsService {
@@ -17,6 +18,9 @@ export class PostsService {
     private postModel: Model<PostDocument>,
     private readonly notificationsService: NotificationsService,
     private readonly profilesService: ProfilesService,
+
+    @Inject(CACHE_MANAGER)
+    private cacheManager: Cache,
   ) {}
 
   async createPost(
@@ -186,5 +190,28 @@ export class PostsService {
       .sort({ createdAt: -1 })
       .limit(50)
       .exec();
+  }
+
+  async getHotPosts(): Promise<PostDocument[]> {
+    const CACHE_KEY = 'feed:hot';
+
+    const cachedData = await this.cacheManager.get<PostDocument[]>(CACHE_KEY);
+    
+    if (cachedData) {
+      return cachedData;
+    }
+
+    console.log('Calculando Hot Posts desde DB...');
+    const hotPosts = await this.postModel
+      .find()
+      .sort({ voteScore: -1 })
+      .limit(20)
+      .populate('authorId', '_id username avatarUrl')
+      .populate('subforumId', '_id name displayName icon')
+      .exec();
+
+    await this.cacheManager.set(CACHE_KEY, hotPosts, 300000);
+
+    return hotPosts;
   }
 }

@@ -87,4 +87,9 @@ export const postService = {
     const response = await axios.get<Post[]>(`${API_URL}/posts/feed`, config);
     return response.data;
   },
+
+  async getHotPosts(): Promise<Post[]> {
+    const response = await axios.get<Post[]>(`${API_URL}/posts/hot`);
+    return response.data;
+  },
 };
