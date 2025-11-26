@@ -146,7 +146,13 @@ export class PostsService {
       throw new NotFoundException('Post no encontrado');
     }
 
-    if (post.authorId !== userId) {
+    // post.authorId puede ser un ObjectId, un string, o un objeto poblado.
+    // Normalizamos a string para comparar con userId correctamente.
+    const postAuthorId = (post.authorId && (post.authorId as any)._id)
+      ? String((post.authorId as any)._id)
+      : String(post.authorId);
+
+    if (postAuthorId !== String(userId)) {
       throw new UnauthorizedException('No tienes permiso para eliminar este post');
     }
 

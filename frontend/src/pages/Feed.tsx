@@ -137,6 +137,25 @@ function Feed() {
     return () => window.removeEventListener('post-updated', handler as EventListener);
   }, []);
 
+  // Escuchamos post-deleted para remover posts del feed cuando se borran
+  useEffect(() => {
+    const delHandler = (e: Event) => {
+      try {
+        const detail = (e as CustomEvent).detail;
+        if (!detail || !detail.id) return;
+        setPosts((prev) => {
+          if (!prev) return prev;
+          return prev.filter(p => p.id !== detail.id);
+        });
+      } catch (err) {
+        // ignore
+      }
+    };
+
+    window.addEventListener('post-deleted', delHandler as EventListener);
+    return () => window.removeEventListener('post-deleted', delHandler as EventListener);
+  }, []);
+
   if (posts === null) {
     return <main style={{ padding: '1.5rem', minHeight: 'calc(100vh - 64px)', width: '100%' }}>Cargando...</main>;
   }

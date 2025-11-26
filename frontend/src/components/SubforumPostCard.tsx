@@ -15,6 +15,8 @@ export default function SubforumPostCard({ post }: Props) {
   
   // Obtenemos el usuario actual para saber si ya votó
   const currentUser = authService.getUser();
+  // Normalizamos el id del autor (soporta populated doc o string)
+  const authorId = (post.authorId as any)?._id || (post.authorId as any).id || (post.authorId as any) || null;
 
   // 2. Calcular estado inicial basado en datos reales de Mongo
   // Dependemos solo de `post._id` para evitar sobrescribir el score
@@ -122,6 +124,23 @@ export default function SubforumPostCard({ post }: Props) {
     }
   };
 
+  // Borrar post (solo visible para el autor)
+  const handleDelete = async () => {
+    const currentUser = authService.getUser();
+    if (!currentUser) return alert('Inicia sesión para eliminar publicaciones');
+
+    if (!confirm('¿Seguro que quieres eliminar esta publicación?')) return;
+
+    try {
+      await postService.deletePost(post._id);
+      // Emitimos evento global para que listas lo quiten
+      window.dispatchEvent(new CustomEvent('post-deleted', { detail: { id: post._id } }));
+    } catch (err) {
+      console.error('Error eliminando post:', err);
+      alert('No se pudo eliminar la publicación.');
+    }
+  };
+
   return (
     <article style={{
       border: 'var(--card-border-width) solid var(--card-border)',
@@ -195,6 +214,15 @@ export default function SubforumPostCard({ post }: Props) {
           </Link>
           <span>•</span>
           <span>{new Date(post.createdAt).toLocaleString()}</span>
+          {/* Mostrar botón eliminar solo al autor */}
+          {currentUser && authorId && currentUser.id === String(authorId) && (
+            <button
+              onClick={handleDelete}
+              style={{ marginLeft: 'auto', padding: '6px 10px', borderRadius: 6, border: 'none', cursor: 'pointer', background: '#e53935', color: '#fff', fontSize: 13 }}
+            >
+              Eliminar
+            </button>
+          )}
         </div>
       </div>
     </article>

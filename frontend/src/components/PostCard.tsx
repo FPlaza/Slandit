@@ -14,6 +14,8 @@ const PostCard: React.FC<Props> = ({ post }) => {
   const navigate = useNavigate();
 
   const currentUser = authService.getUser();
+  // Normalizamos el id del autor (soporta mock shape o objeto populated)
+  const authorId = (post.author && (post.author as any).id) || (post.authorId && ((post as any).authorId._id || (post as any).authorId.id)) || null;
   const usernameForStorage = currentUser?.username || mockProfile.username;
   const [animateScore, setAnimateScore] = useState(false);
 
@@ -206,6 +208,24 @@ const PostCard: React.FC<Props> = ({ post }) => {
           >
             @{post.author.username}
           </Link>
+          {/* Mostrar botón eliminar solo al autor */}
+          {currentUser && authorId && currentUser.id === String(authorId) && (
+            <button
+              onClick={async () => {
+                if (!confirm('¿Seguro que quieres eliminar esta publicación?')) return;
+                try {
+                  await postService.deletePost(post.id);
+                  window.dispatchEvent(new CustomEvent('post-deleted', { detail: { id: post.id } }));
+                } catch (err) {
+                  console.error('Error eliminando post:', err);
+                  alert('No se pudo eliminar la publicación.');
+                }
+              }}
+              style={{ marginLeft: 'auto', padding: '6px 10px', borderRadius: 6, border: 'none', cursor: 'pointer', background: '#e53935', color: '#fff', fontSize: 13 }}
+            >
+              Eliminar
+            </button>
+          )}
         </div>
 
         {/* 🔥 Título clickeable con username */}

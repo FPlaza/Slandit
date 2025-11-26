@@ -54,7 +54,18 @@ export const authService = {
   },
 
   getUser() {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    const userRaw = localStorage.getItem('user');
+    if (!userRaw) return null;
+    try {
+      const user = JSON.parse(userRaw);
+      // Normalizar: asegurar que siempre haya `id` además de `_id`
+      if (!user.id && (user._id || user.id === undefined)) {
+        user.id = user._id || user.id;
+      }
+      return user;
+    } catch (err) {
+      console.error('Error parsing stored user', err);
+      return null;
+    }
   },
 };
