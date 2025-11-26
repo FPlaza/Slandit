@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import type { MockPost } from '../mocks/mockData';
 import { mockSubforums, mockProfile } from '../mocks/mockData';
 import { getVote, setVote, getScoreAdjustmentFor, type Vote } from '../utils/voteStorage';
+import { postService } from '../services/postService';
+import { authService } from '../services/authService';
 
 type Props = { post: MockPost };
 
@@ -11,43 +13,120 @@ const PostCard: React.FC<Props> = ({ post }) => {
   const [score, setScore] = useState<number>(post.voteScore);
   const navigate = useNavigate();
 
+  const currentUser = authService.getUser();
+  const usernameForStorage = currentUser?.username || mockProfile.username;
+  const [animateScore, setAnimateScore] = useState(false);
+
   useEffect(() => {
-    const stored = getVote(post.id, mockProfile.username);
+    const stored = getVote(post.id, usernameForStorage);
     setVoteState(stored);
     setScore(post.voteScore + getScoreAdjustmentFor(stored));
-  }, [post.id]);
 
-  const handleUp = () => {
-    const current = getVote(post.id, mockProfile.username);
-    if (current === 'up') {
-      setVote(post.id, mockProfile.username, null);
+    const handler = (e: Event) => {
+      try {
+        const detail = (e as CustomEvent).detail;
+        if (!detail) return;
+
+        // El identificador que viene del servidor es `_id`, en UI usamos `id`
+        const updatedId = detail._id || detail.id;
+        if (updatedId !== post.id) return;
+
+        // Si el servidor devolvió arrays de votos, actualizamos estado en base a user
+        if (detail.upvotedBy || detail.downvotedBy) {
+          const userId = currentUser?.id;
+          if (userId) {
+            if (detail.upvotedBy && detail.upvotedBy.includes(userId)) setVoteState('up');
+            else if (detail.downvotedBy && detail.downvotedBy.includes(userId)) setVoteState('down');
+            else setVoteState(null);
+          }
+        }
+
+        if (typeof detail.voteScore === 'number') {
+          // Si cambia el score, actualizamos e iniciamos una animación corta
+          if (detail.voteScore !== score) {
+            setScore(detail.voteScore);
+            setAnimateScore(true);
+            setTimeout(() => setAnimateScore(false), 300);
+          } else {
+            setScore(detail.voteScore);
+          }
+        }
+      } catch (err) {
+        // ignore
+      }
+    };
+
+    window.addEventListener('post-updated', handler as EventListener);
+
+    return () => {
+      window.removeEventListener('post-updated', handler as EventListener);
+    };
+  }, [post.id, usernameForStorage, currentUser]);
+
+  const handleUp = async () => {
+    const current = getVote(post.id, usernameForStorage);
+
+    // Si hay usuario autenticado intentamos la llamada al backend
+    if (currentUser) {
+      try {
+        const updated = await postService.toggleUpvote(post.id);
+        // Normalizamos id y _id y emitimos evento con el post actualizado para sincronizar otras vistas
+        window.dispatchEvent(new CustomEvent('post-updated', { detail: { ...(updated as any), id: (updated as any)._id || (updated as any).id } }));
+      } catch (err) {
+        console.error('Error toggling upvote', err);
+      }
+
+      return;
+    }
+
+    // Sinon, comportamiento local (mock) usando storage
+      if (current === 'up') {
+      setVote(post.id, usernameForStorage, null);
       setVoteState(null);
       setScore((s) => s - 1);
+      window.dispatchEvent(new CustomEvent('post-updated', { detail: { id: post.id, _id: post.id, voteScore: score - 1 } }));
     } else if (current === 'down') {
-      setVote(post.id, mockProfile.username, 'up');
+      setVote(post.id, usernameForStorage, 'up');
       setVoteState('up');
       setScore((s) => s + 2);
+      window.dispatchEvent(new CustomEvent('post-updated', { detail: { id: post.id, _id: post.id, voteScore: score + 2 } }));
     } else {
-      setVote(post.id, mockProfile.username, 'up');
+      setVote(post.id, usernameForStorage, 'up');
       setVoteState('up');
       setScore((s) => s + 1);
+      window.dispatchEvent(new CustomEvent('post-updated', { detail: { id: post.id, _id: post.id, voteScore: score + 1 } }));
     }
   };
 
-  const handleDown = () => {
-    const current = getVote(post.id, mockProfile.username);
+  const handleDown = async () => {
+    const current = getVote(post.id, usernameForStorage);
+
+    if (currentUser) {
+      try {
+        const updated = await postService.toggleDownvote(post.id);
+        window.dispatchEvent(new CustomEvent('post-updated', { detail: { ...(updated as any), id: (updated as any)._id || (updated as any).id } }));
+      } catch (err) {
+        console.error('Error toggling downvote', err);
+      }
+
+      return;
+    }
+
     if (current === 'down') {
-      setVote(post.id, mockProfile.username, null);
+      setVote(post.id, usernameForStorage, null);
       setVoteState(null);
       setScore((s) => s + 1);
+      window.dispatchEvent(new CustomEvent('post-updated', { detail: { id: post.id, _id: post.id, voteScore: score + 1 } }));
     } else if (current === 'up') {
-      setVote(post.id, mockProfile.username, 'down');
+      setVote(post.id, usernameForStorage, 'down');
       setVoteState('down');
       setScore((s) => s - 2);
+      window.dispatchEvent(new CustomEvent('post-updated', { detail: { id: post.id, _id: post.id, voteScore: score - 2 } }));
     } else {
-      setVote(post.id, mockProfile.username, 'down');
+      setVote(post.id, usernameForStorage, 'down');
       setVoteState('down');
       setScore((s) => s - 1);
+      window.dispatchEvent(new CustomEvent('post-updated', { detail: { id: post.id, _id: post.id, voteScore: score - 1 } }));
     }
   };
 
@@ -73,7 +152,7 @@ const PostCard: React.FC<Props> = ({ post }) => {
           ▲
         </button>
 
-        <strong>{score}</strong>
+        <strong style={{ transition: 'transform 200ms ease', transform: animateScore ? 'scale(1.12)' : 'none' }}>{score}</strong>
 
         <button
           className={`vote-btn down ${vote === 'down' ? 'active' : ''}`}

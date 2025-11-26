@@ -171,4 +171,14 @@ export class PostsService {
       .limit(50)
       .exec();
   }
+
+  async findRecent(): Promise<PostDocument[]> {
+    return this.postModel
+      .find({})
+      .populate('authorId', '_id username avatarUrl')
+      .populate('subforumId', '_id name displayName icon')
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .exec();
+  }
 }

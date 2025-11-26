@@ -11,11 +11,14 @@ type VoteStatus = 'up' | 'down' | null;
 export default function SubforumPostCard({ post }: Props) {
   const [score, setScore] = useState<number>(post.voteScore);
   const [userVote, setUserVote] = useState<VoteStatus>(null);
+  const [animate, setAnimate] = useState(false);
   
   // Obtenemos el usuario actual para saber si ya votó
   const currentUser = authService.getUser();
 
   // 2. Calcular estado inicial basado en datos reales de Mongo
+  // Dependemos solo de `post._id` para evitar sobrescribir el score
+  // cuando llegan re-renders del padre después de un voto local.
   useEffect(() => {
     if (!currentUser) {
       setUserVote(null);
@@ -30,9 +33,44 @@ export default function SubforumPostCard({ post }: Props) {
       setUserVote(null);
     }
     
-    // Actualizamos el score por si el post prop cambió
+    // Inicializamos el score con el valor del post al montar o cambiar de post
     setScore(post.voteScore);
-  }, [post, currentUser]);
+  }, [post._id, currentUser]);
+
+  // Escuchamos eventos globales de post actualizado para sincronizar varias instancias
+  useEffect(() => {
+    const handler = (e: Event) => {
+      try {
+        const detail = (e as CustomEvent).detail;
+        if (!detail) return;
+
+        const updatedId = detail._id || detail.id;
+        if (updatedId !== post._id) return;
+
+        if (typeof detail.voteScore === 'number') {
+          if (detail.voteScore !== score) {
+            setScore(detail.voteScore);
+            setAnimate(true);
+            setTimeout(() => setAnimate(false), 300);
+          } else {
+            setScore(detail.voteScore);
+          }
+        }
+
+        const userId = currentUser?.id;
+        if (userId && (detail.upvotedBy || detail.downvotedBy)) {
+          if (detail.upvotedBy && detail.upvotedBy.includes(userId)) setUserVote('up');
+          else if (detail.downvotedBy && detail.downvotedBy.includes(userId)) setUserVote('down');
+          else setUserVote(null);
+        }
+      } catch (err) {
+        // ignore
+      }
+    };
+
+    window.addEventListener('post-updated', handler as EventListener);
+    return () => window.removeEventListener('post-updated', handler as EventListener);
+  }, [post._id, currentUser]);
 
   // 3. Manejadores de Voto conectados a la API
   const handleUp = async () => {
@@ -54,6 +92,9 @@ export default function SubforumPostCard({ post }: Props) {
       if (updatedPost.upvotedBy.includes(currentUser.id)) setUserVote('up');
       else setUserVote(null);
 
+      // Emitimos evento para sincronizar otras vistas (normalizamos id y _id)
+      window.dispatchEvent(new CustomEvent('post-updated', { detail: { ...updatedPost, id: (updatedPost as any)._id || (updatedPost as any).id } }));
+
     } catch (error) {
       console.error("Error votando:", error);
       // Si falla, revertimos (Rollback)
@@ -72,6 +113,9 @@ export default function SubforumPostCard({ post }: Props) {
       
       if (updatedPost.downvotedBy.includes(currentUser.id)) setUserVote('down');
       else setUserVote(null);
+
+      // Emitimos evento para sincronizar otras vistas (normalizamos id y _id)
+      window.dispatchEvent(new CustomEvent('post-updated', { detail: { ...updatedPost, id: (updatedPost as any)._id || (updatedPost as any).id } }));
 
     } catch (error) {
       console.error("Error votando:", error);
@@ -101,7 +145,7 @@ export default function SubforumPostCard({ post }: Props) {
           ▲
         </button>
         
-        <strong style={{ margin: '4px 0' }}>{score}</strong>
+        <strong style={{ margin: '4px 0', transition: 'transform 200ms ease', transform: animate ? 'scale(1.12)' : 'none' }}>{score}</strong>
         
         <button 
           className={`vote-btn down ${userVote === 'down' ? 'active' : ''}`} 

@@ -54,6 +54,11 @@ export const postService = {
     return response.data;
   },
 
+  async getRecentPosts(): Promise<Post[]> {
+    const response = await axios.get<Post[]>(`${API_URL}/posts/recent`);
+    return response.data;
+  },
+
   async deletePost(postId: string): Promise<{ message: string }> {
     const token = authService.getToken();
     if (!token) throw new Error('No hay token. No tienes permiso para eliminar.');

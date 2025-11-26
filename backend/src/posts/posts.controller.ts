@@ -63,5 +63,10 @@ export class PostsController {
     return this.postsService.findPostById(id);
   }
 
+  @Get('recent')
+  async findRecent() {
+    return this.postsService.findRecent();
+  }
+
 
 }
