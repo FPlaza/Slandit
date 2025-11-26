@@ -77,4 +77,16 @@ export class SubforumsService {
      
      return { message: 'Has salido del subforo' };
   }
+
+  async search(query: string) {
+    return this.subforumModel.find({
+      $or: [
+        { name: { $regex: query, $options: 'i' } },
+        { displayName: { $regex: query, $options: 'i' } }
+      ]
+    })
+    .select('name displayName icon memberCount')
+    .limit(5)
+    .exec();
+  }
 }

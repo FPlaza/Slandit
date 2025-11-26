@@ -13,6 +13,7 @@ import { CommentsModule } from './comments/comments.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
 import { NotificationsModule } from './notifications/notifications.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     PostsModule,
     CommentsModule,
     NotificationsModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [AppService],

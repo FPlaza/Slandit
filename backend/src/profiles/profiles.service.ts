@@ -112,4 +112,13 @@ export class ProfilesService {
     
     return profile.joinedSubforums || [];
   }
+
+  async search(query: string) {
+    return this.profileModel.find({
+      username: { $regex: query, $options: 'i' }
+    })
+    .select('username avatarUrl karma')
+    .limit(5)
+    .exec();
+  }
 }
