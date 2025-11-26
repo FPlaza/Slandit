@@ -74,3 +74,88 @@
 .search-input::placeholder {
   color: rgba(88, 255, 138, 0.5);
 }
+
+.notification-badge {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background-color: #e91e63; /* Color llamativo */
+  color: white;
+  font-size: 0.65rem;
+  font-weight: bold;
+  padding: 2px 5px;
+  border-radius: 10px;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--header-bg); /* Borde para separar del icono */
+}
+
+/* El contenedor del menú desplegable */
+.notifications-dropdown {
+  position: absolute;
+  top: 120%; /* Justo debajo del botón */
+  right: -10px; /* Alineado a la derecha */
+  width: 300px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  z-index: 2000;
+  overflow: hidden;
+}
+
+.notif-header {
+  margin: 0;
+  padding: 10px 15px;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--card-border);
+  background: rgba(0,0,0,0.03);
+  color: var(--header-text);
+}
+
+.notif-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.notif-item {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--card-border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.notif-item:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+/* Estilo para las no leídas */
+.notif-item.unread {
+  background: rgba(33, 150, 243, 0.1); /* Un azul muy sutil */
+  border-left: 3px solid #2196f3;
+}
+
+.notif-content {
+  margin: 0 0 5px 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--card-text);
+}
+
+.notif-date {
+  font-size: 0.75rem;
+  color: var(--muted-text);
+}
+
+.notif-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--muted-text);
+  font-size: 0.9rem;
+}

@@ -7,6 +7,7 @@ import { authService } from '../services/authService';
 import { searchService } from '../services/searchService';
 import type { SearchResults } from '../types/search.types';
 import LogoSlandit from '../assets/LogoSlandit.png';
+import { notificationService } from '../services/notificationsService';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -15,6 +16,9 @@ export default function Header() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResults | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   // 🔥 Escucha cambios de login/logout
   useEffect(() => {
@@ -47,6 +51,24 @@ export default function Header() {
     return () => clearTimeout(delayDebounceFn);
   }, [query]);
 
+  useEffect(() => {
+    if (user) {
+      loadUnreadCount();
+      // Opcional: Polling cada 60s para actualizar el numerito
+      const interval = setInterval(loadUnreadCount, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  const loadUnreadCount = async () => {
+    try {
+      const data = await notificationService.getUnreadCount();
+      setUnreadCount(data.count);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleSearch = () => {
     setShowSearch(!showSearch);
     if (!showSearch) {
@@ -61,8 +83,33 @@ export default function Header() {
       setQuery('');
   };
 
-  const handleNotifications = () => {
-    alert('Notificaciones: Esta funcionalidad estará disponible próximamente');
+  const handleNotificationsToggle = async () => {
+    if (!showNotifications) {
+      try {
+        const list = await notificationService.getMyNotifications();
+        setNotifications(list);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    setShowNotifications(!showNotifications);
+  };
+
+  const handleNotificationClick = async (notif: any) => {
+    if (!notif.read) {
+      notificationService.markAsRead(notif._id);
+      setUnreadCount((prev) => Math.max(0, prev - 1)); 
+    }
+
+    setShowNotifications(false);
+
+    if (notif.resourceType === 'Post' && notif.resourceId) {
+      navigate(`/posts/${notif.resourceId}`);
+    }
+
+    if (notif.type === 'SUBFORUM_UNLOCKED') {
+        navigate(`/profile/${user.username}`);
+    }
   };
 
   const handleProfile = () => {
@@ -104,13 +151,51 @@ export default function Header() {
         {user ? (
           <>
             {/* 🔔 NOTIFICACIONES */}
-            <button
-              className="icon-btn"
-              title="Notificaciones"
-              onClick={handleNotifications}
-            >
-              <MdNotifications size={24} />
-            </button>
+            <div className="notification-wrapper" style={{ position: 'relative' }}>
+              
+              <button
+                className="icon-btn"
+                title="Notificaciones"
+                onClick={handleNotificationsToggle} // <-- Usamos la nueva función
+                style={{ position: 'relative' }} // Para posicionar la burbuja
+              >
+                <MdNotifications size={24} />
+                
+                {/* La Burbuja Roja (Solo si hay > 0) */}
+                {unreadCount > 0 && (
+                  <span className="notification-badge">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* El Menú Desplegable (Solo si showNotifications es true) */}
+              {showNotifications && (
+                <div className="notifications-dropdown">
+                  <h4 className="notif-header">Notificaciones</h4>
+                  
+                  {notifications.length === 0 ? (
+                    <p className="notif-empty">No tienes notificaciones.</p>
+                  ) : (
+                    <ul className="notif-list">
+                      {notifications.map((notif) => (
+                        <li 
+                          key={notif._id} 
+                          // Clase diferente si no está leída (para ponerle fondo azulito)
+                          className={`notif-item ${!notif.read ? 'unread' : ''}`}
+                          onClick={() => handleNotificationClick(notif)}
+                        >
+                          <p className="notif-content">{notif.content}</p>
+                          <small className="notif-date">
+                            {new Date(notif.createdAt).toLocaleDateString()}
+                          </small>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* 👤 PERFIL */}
             <button

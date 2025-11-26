@@ -78,33 +78,33 @@ export class ProfilesService {
     }
 
     async addCurrency(userId: string, amount: number): Promise<ProfileDocument> {
-    const profile = await this.profileModel.findById(userId);
-    
-    if (!profile) throw new NotFoundException('Perfil no encontrado');
+        const profile = await this.profileModel.findById(userId);
 
-    const previousCurrency = profile.currency;
-    const newCurrency = previousCurrency + amount;
+        if (!profile) throw new NotFoundException('Perfil no encontrado');
 
-    
-    profile.currency = newCurrency;
+        const previousCurrency = profile.currency;
+        const newCurrency = previousCurrency + amount;
 
-    
-    
-    
-    if (previousCurrency < this.SUBFORUM_COST && newCurrency >= this.SUBFORUM_COST) {
-      
-      await this.notificationsService.create({
-        recipientId: userId,
-        triggerUserId: null, 
-        type: NotificationType.SUBFORUM_UNLOCKED,
-        content: `¡Felicidades! Has alcanzado ${newCurrency} monedas. Ahora tienes permiso para crear tus propios Subforos.`,
-        resourceId: null, 
-        resourceType: 'System'
-      });
+
+        profile.currency = newCurrency;
+
+
+
+
+        if (previousCurrency < this.SUBFORUM_COST && newCurrency >= this.SUBFORUM_COST) {
+
+            await this.notificationsService.create({
+                recipientId: userId,
+                triggerUserId: null,
+                type: NotificationType.SUBFORUM_UNLOCKED,
+                content: `¡Felicidades! Has alcanzado ${newCurrency} monedas. Ahora tienes permiso para crear tus propios Subforos.`,
+                resourceId: null,
+                resourceType: 'System'
+            });
+        }
+
+        return profile.save();
     }
-
-    return profile.save();
-  }
 
   async getJoinedSubforumsIds(userId: string): Promise<any[]> {
     const profile = await this.profileModel.findById(userId).exec();
