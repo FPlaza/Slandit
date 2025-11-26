@@ -1,0 +1,174 @@
+/* Contenedor principal centrado */
+.post-detail-container {
+  max-width: 800px; /* Un poco más estrecho que el perfil para facilitar la lectura */
+  margin: 0 auto;
+  padding: 20px;
+  min-height: calc(100vh - 64px);
+}
+
+/* --- TARJETA PRINCIPAL DEL POST --- */
+.post-detail-card {
+  background: var(--card-bg);
+  border: var(--card-border-width) solid var(--card-border);
+  border-radius: 8px; /* Coincide con PostCard */
+  display: flex;
+  overflow: hidden; /* Para que la barra lateral de votos no se salga */
+  box-shadow: var(--card-shadow);
+  margin-bottom: 20px;
+}
+
+/* Columna de Votos (Izquierda) */
+.post-votes-sidebar {
+  width: 56px; /* Coincide con PostCard */
+  background: rgba(0,0,0,0.02); /* Sutil diferencia de fondo */
+  border-right: 1px solid var(--card-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 16px;
+  gap: 4px;
+}
+
+/* Contenido del Post (Derecha) */
+.post-content-wrapper {
+  flex: 1;
+  padding: 16px 24px;
+}
+
+/* Header (Subforo, Autor, Fecha) */
+.post-header-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted-text);
+  margin-bottom: 12px;
+}
+
+.subforum-icon-small {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.subforum-link {
+  font-weight: 700;
+  color: var(--card-text); /* O un color de acento si prefieres */
+  text-decoration: none;
+}
+
+.subforum-link:hover {
+  text-decoration: underline;
+}
+
+.author-link {
+  color: var(--muted-text);
+  text-decoration: none;
+}
+
+.author-link:hover {
+  text-decoration: underline;
+}
+
+/* Título y Cuerpo */
+.post-detail-title {
+  margin: 0 0 16px 0;
+  font-size: 24px;
+  line-height: 1.3;
+  color: var(--card-title);
+}
+
+.post-detail-body {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--card-text);
+  white-space: pre-wrap; /* Respeta saltos de línea */
+  margin-bottom: 20px;
+}
+
+/* --- SECCIÓN DE COMENTARIOS --- */
+.comments-section {
+  background: var(--card-bg);
+  border: var(--card-border-width) solid var(--card-border);
+  border-radius: 8px;
+  padding: 20px 24px;
+}
+
+.comment-form {
+  margin-bottom: 30px;
+}
+
+.comment-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: var(--bg-color); /* Un poco más oscuro que la tarjeta */
+  color: var(--card-text);
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  margin-bottom: 10px;
+}
+
+.comment-textarea:focus {
+  outline: 2px solid var(--primary-color, #9f4bee);
+  border-color: transparent;
+}
+
+.submit-btn {
+  background: var(--primary-color, #9f4bee);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: opacity 0.2s;
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Estilo de un Comentario Individual */
+.comment-item {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.comment-item:last-child {
+  border-bottom: none;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.comment-author {
+  font-weight: 600;
+  color: var(--card-title);
+  text-decoration: none;
+}
+
+.comment-body {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--card-text);
+}
+
+/* Estados de carga/error */
+.page-loading, .page-error {
+  padding: 40px;
+  text-align: center;
+  color: var(--muted-text);
+}

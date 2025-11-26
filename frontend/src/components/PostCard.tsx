@@ -236,7 +236,7 @@ const PostCard: React.FC<Props> = ({ post }) => {
             color: 'var(--card-title)',
             cursor: 'pointer'
           }}
-          onClick={() => navigate(`/post/${post.id}/${post.author.username}`)}
+          onClick={() => navigate(`/posts/${post.id}`)}
         >
           {post.title}
         </h3>

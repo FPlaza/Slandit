@@ -42,7 +42,7 @@ export class PostsService {
     const post = await this.postModel
     .findById(id)
     .populate('authorId', '_id username avatarUrl')
-    .populate('subforumId', '_id name displayName')
+    .populate('subforumId', '_id name displayName icon banner')
     .exec();
 
     if (!post) {

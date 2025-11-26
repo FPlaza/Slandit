@@ -8,6 +8,7 @@ import Subforum from './pages/Subforum';
 import Register from './pages/Register';
 import CreatePost from './pages/CreatePost';
 import GuestProfile from './pages/GuestProfile';
+import Post from './pages/Post';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/guest-profile/:username" element={<GuestProfile />} />
           <Route path="/subforum/:id" element={<Subforum />} />
           <Route path="/create-post" element={<CreatePost />} />
+          <Route path="/posts/:id" element={<Post />} />
         </Route>
 
         <Route element={<EmptyLayout />}>
