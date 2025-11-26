@@ -11,6 +11,11 @@ export const profileService = {
     return response.data;
   },
 
+  async getProfileByUsername(username: string): Promise<Profile> {
+    const response = await axios.get<Profile>(`${API_URL}/profiles/username/${username}`);
+    return response.data;
+  },
+
   async getMyProfile(): Promise<Profile> {
     const token = authService.getToken();
     if (!token) throw new Error("No hay token. Inicia sesión.");

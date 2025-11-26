@@ -9,12 +9,12 @@ export class ProfilesService {
     constructor(
         @InjectModel(Profile.name)
         private profileModel: Model<ProfileDocument>,
-    ){}
+    ) { }
 
     async findProfileById(id: string): Promise<ProfileDocument> {
         const profile = await this.profileModel.findById(id).exec();
 
-        if (!profile){
+        if (!profile) {
             throw new NotFoundException(`Perfil con ID ${id} no encontrado`);
         }
 
@@ -34,7 +34,7 @@ export class ProfilesService {
         return newProfile.save();
     }
 
-    async updateProfile(id: string, updateProfileDto: UpdateProfileDto): Promise<ProfileDocument>{
+    async updateProfile(id: string, updateProfileDto: UpdateProfileDto): Promise<ProfileDocument> {
 
         const updatedProfile = await this.profileModel.findByIdAndUpdate(
             id,
@@ -58,6 +58,16 @@ export class ProfilesService {
             .exec();
 
         if (!profile) throw new NotFoundException();
+
+        return profile;
+    }
+
+    async findProfileByUsername(username: string): Promise<ProfileDocument> {
+        const profile = await this.profileModel.findOne({ username }).exec();
+
+        if (!profile) {
+            throw new NotFoundException(`Perfil con username ${username} no encontrado`);
+        }
 
         return profile;
     }

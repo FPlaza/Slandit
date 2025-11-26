@@ -8,25 +8,41 @@ import type { SubforumInfo } from '../types/subforum.types';
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
   const [joinedSubforums, setJoinedSubforums] = useState<SubforumInfo[]>([]);
+  const [user, setUser] = useState<any>(authService.getUser());
   const navigate = useNavigate();
 
-  const user = authService.getUser(); // Detectar si el usuario está loggeado
-
+  /** 🔥 Detecta login/logout automáticamente */
   useEffect(() => {
-    // Si NO hay usuario, no intentes cargar subforos
-    if (!user) return;
+    const updateUser = () => {
+      const u = authService.getUser();
+      setUser(u);
 
-    async function loadSubforums() {
-      try {
-        const profile = await profileService.getMyProfile();
-        setJoinedSubforums(profile.joinedSubforums || []);
-      } catch (err) {
-        console.error("Error cargando subforos del usuario:", err);
-      }
+      // Si hay usuario, recargar subforos
+      if (u) loadSubforums();
+      else setJoinedSubforums([]);
+    };
+
+    window.addEventListener("auth-changed", updateUser);
+
+    return () => window.removeEventListener("auth-changed", updateUser);
+  }, []);
+
+  /** 🔄 Cargar subforos del usuario */
+  async function loadSubforums() {
+    try {
+      const profile = await profileService.getMyProfile();
+      setJoinedSubforums(profile.joinedSubforums || []);
+    } catch (err) {
+      console.error("Error cargando subforos del usuario:", err);
     }
+  }
 
-    loadSubforums();
-  }, [user]);
+  /** 🚪 Logout */
+  const handleLogout = () => {
+    authService.logout();
+    window.dispatchEvent(new Event("auth-changed"));
+    navigate("/"); // opcional: enviar al home
+  };
 
   return (
     <div
@@ -42,48 +58,68 @@ export default function Sidebar() {
     >
       <nav className={`sidebar${open ? ' open' : ''}`}>
         {open && (
-          <ul>
-            {!user ? (
-              // ⚠ Usuario NO loggeado
-              <p style={{ padding: '12px', opacity: 0.75 }}>
-                Para ver tus subforos, inicia sesión.
-              </p>
-            ) : joinedSubforums.length === 0 ? (
-              // Usuario loggeado pero sin subforos
-              <p style={{ padding: '12px', opacity: 0.6 }}>
-                No estás suscrito a ningún subforo.
-              </p>
-            ) : (
-              // Usuario loggeado con subforos
-              joinedSubforums.map((sf) => (
-                <li key={sf._id}>
-                  <button
-                    className="sidebar-link"
-                    onClick={() => navigate(`/subforum/${sf.name}`)}
-                    title={sf.displayName}
-                    aria-label={sf.displayName}
-                  >
-                    <img
-                      src={sf.icon || '/icons/default.png'}
-                      alt={sf.displayName}
-                      className="sidebar-icon large"
-                    />
-                  </button>
-                </li>
-              ))
+          <>
+            <ul style={{ flexGrow: 1 }}>
+              {!user ? (
+                // 🔸 Invitado
+                <p style={{ padding: '12px', opacity: 0.75 }}>
+                  Inicia sesión para ver tus subforos.
+                </p>
+              ) : joinedSubforums.length === 0 ? (
+                // 🔸 Loggeado, sin subforos
+                <p style={{ padding: '12px', opacity: 0.6 }}>
+                  No estás suscrito a ningún subforo.
+                </p>
+              ) : (
+                // 🔸 Loggeado con subforos
+                joinedSubforums.map((sf) => (
+                  <li key={sf._id}>
+                    <button
+                      className="sidebar-link"
+                      onClick={() => navigate(`/subforum/${sf.name}`)}
+                      title={sf.displayName}
+                      aria-label={sf.displayName}
+                    >
+                      <img
+                        src={sf.icon || '/icons/default.png'}
+                        alt={sf.displayName}
+                        className="sidebar-icon large"
+                      />
+                    </button>
+                  </li>
+                ))
+              )}
+            </ul>
+
+            {/* 🚪 BOTÓN DE CERRAR SESIÓN (solo si hay usuario) */}
+            {user && (
+              <div style={{ padding: '12px', marginTop: 'auto' }}>
+                <button
+                  className="logout-btn"
+                  onClick={handleLogout}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    background: '#d9534f',
+                    border: 'none',
+                    color: 'white',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
+                  Cerrar sesión
+                </button>
+              </div>
             )}
-          </ul>
+          </>
         )}
       </nav>
 
       <button
         className="sidebar-toggle"
         onClick={() => setOpen(!open)}
-        style={{
-          alignSelf: 'flex-start',
-          marginTop: '8px',
-          transition: 'left 0.18s',
-        }}
+        style={{ alignSelf: 'flex-start', marginTop: '8px' }}
       >
         ☰
       </button>

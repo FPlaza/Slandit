@@ -14,6 +14,10 @@ function handleAuthSuccess(data: { accessToken: string; user: any }) {
   if (data.user) {
     localStorage.setItem('user', JSON.stringify(data.user));
   }
+
+  // 🔥 Dispara evento para que Header, Sidebar, etc. se actualicen
+  window.dispatchEvent(new Event("auth-changed"));
+
   return data;
 }
 
@@ -40,6 +44,9 @@ export const authService = {
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+
+    // 🔥 MUY IMPORTANTE: avisar a la app del cambio
+    window.dispatchEvent(new Event("auth-changed"));
   },
 
   getToken() {

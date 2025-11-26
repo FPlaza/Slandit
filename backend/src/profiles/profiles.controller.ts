@@ -7,26 +7,31 @@ import { AuthGuard } from '@nestjs/passport';
 export class ProfilesController {
     constructor(
         private readonly profilesService: ProfilesService
-    ){}
+    ) { }
 
     @UseGuards(AuthGuard('jwt'))
     @Get('me')
     async findMyProfile(@Request() req) {
         return this.profilesService.findMyProfileWithSubforums(req.user.id);
     }
-    
+
 
     @UseGuards(AuthGuard('jwt'))
     @Patch('me')
     async updateMyProfile(
         @Request() req,
         @Body() updateProfileDto: UpdateProfileDto,
-    ){
+    ) {
         return await this.profilesService.updateProfile(req.user.id, updateProfileDto);
     }
 
     @Get(':id')
-    async findOne(@Param('id') id: string){
+    async findOne(@Param('id') id: string) {
         return await this.profilesService.findProfileById(id);
+    }
+
+    @Get('username/:username')
+    async findByUsername(@Param('username') username: string) {
+        return await this.profilesService.findProfileByUsername(username);
     }
 }
