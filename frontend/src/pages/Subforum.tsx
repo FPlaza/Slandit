@@ -1,4 +1,4 @@
-import { useEffect, useState, FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import { subforumService } from '../services/subforumService';
 import { postService } from '../services/postService'; // Necesitas este para los posts

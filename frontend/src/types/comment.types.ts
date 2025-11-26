@@ -11,7 +11,7 @@ export interface Comment {
   downvotedBy: string[];
   createdAt: string;
   updatedAt: string;
-  replies?: Comment[]; 
+  children?: Comment[]; 
 }
 
 export interface CreateCommentDto {

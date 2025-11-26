@@ -5,6 +5,7 @@ import { commentService } from '../services/commentService';
 import { authService } from '../services/authService';
 import type { Post as PostType } from '../types/post.types';
 import type { Comment } from '../types/comment.types';
+import CommentItem from '../components/CommentItem'; // <--- ¡Asegúrate de tener este componente creado!
 import '../styles/Post.css';
 import { MdChatBubbleOutline } from 'react-icons/md';
 
@@ -19,7 +20,7 @@ export default function Post() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Estados para el nuevo comentario
+  // Estados para el nuevo comentario (Principal)
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
   
@@ -57,31 +58,65 @@ export default function Post() {
       }
     };
     loadData();
-  }, [id, user?.id]); // Dependencia user.id por si cambia de usuario
+  }, [id, user?.id]);
 
-  // 2. Manejar envío de comentario
-  const handleCommentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newComment.trim() || !id) return;
+
+  // --- LÓGICA DE ÁRBOL DE COMENTARIOS ---
+  const buildCommentTree = (flatComments: Comment[]) => {
+    const commentMap: { [key: string]: Comment } = {};
+    const roots: Comment[] = [];
+
+    // Paso 1: Crear mapa y añadir array de hijos vacío
+    flatComments.forEach(c => {
+      commentMap[c._id] = { ...c, children: [] };
+    });
+
+    // Paso 2: Organizar jerarquía
+    flatComments.forEach(c => {
+      if (c.parentId && commentMap[c.parentId]) {
+        // Es hijo: lo metemos en el padre
+        commentMap[c.parentId].children!.push(commentMap[c._id]);
+      } else {
+        // Es raíz: va al array principal
+        roots.push(commentMap[c._id]);
+      }
+    });
+
+    // Ordenar por fecha: más recientes abajo (opcional)
+    return roots.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  };
+
+  const commentTree = buildCommentTree(comments);
+
+  // --- MANEJO DE RESPUESTAS (Principal y Anidadas) ---
+  const handleReplySubmit = async (content: string, parentId?: string) => {
+    if (!content.trim() || !id) return;
     if (!user) return alert("Inicia sesión para comentar");
 
-    setSubmitting(true);
+    // Si es comentario principal, activamos loading del form principal
+    if (!parentId) setSubmitting(true);
+
     try {
       await commentService.createComment({
-        content: newComment,
+        content: content,
         postId: id,
+        parentId: parentId, // Si existe, es respuesta anidada
       });
       
-      // Recargar comentarios para ver el nuevo (y ver author populado)
+      // Recargar comentarios para reconstruir el árbol
       const commentsData = await commentService.getCommentsByPostId(id);
       setComments(commentsData);
-      setNewComment('');
+      
+      // Si fue comentario principal, limpiamos el input grande
+      if (!parentId) setNewComment('');
+      
     } catch (error) {
       console.error("Error comentando:", error);
     } finally {
-      setSubmitting(false);
+      if (!parentId) setSubmitting(false);
     }
   };
+
 
   // 3. Manejadores de Voto (Lógica idéntica a PostCard)
   const handleUp = async () => {
@@ -116,6 +151,11 @@ export default function Post() {
   if (loading) return <div className="page-loading">Cargando...</div>;
   if (!post) return <div className="page-error">No se encontró la publicación.</div>;
 
+  const isAuthor = user?.username === post.authorId.username;
+  const authorProfileLink = isAuthor 
+    ? `/profile/${post.authorId.username}` 
+    : `/guest-profile/${post.authorId.username}`;
+
   return (
     <main className="post-detail-container">
       
@@ -141,7 +181,6 @@ export default function Post() {
         <div className="post-content-wrapper">
           {/* Header: Subforo y Autor */}
           <div className="post-header-info">
-            {/* Icono Subforo */}
             <img 
               src={post.subforumId.icon || '/icons/default.png'} 
               alt="" 
@@ -154,7 +193,7 @@ export default function Post() {
             <span>•</span>
             
             <span style={{color: 'var(--muted-text)'}}>publicado por</span>
-            <Link to={`/profile/${post.authorId.username}`} className="author-link">
+            <Link to={authorProfileLink} className="author-link">
               @{post.authorId.username}
             </Link>
             
@@ -182,8 +221,10 @@ export default function Post() {
 
       {/* --- SECCIÓN DE COMENTARIOS --- */}
       <section className="comments-section">
+        
+        {/* Formulario PRINCIPAL (para comentar el post directamente) */}
         {user ? (
-          <form className="comment-form" onSubmit={handleCommentSubmit}>
+          <form className="comment-form" onSubmit={(e) => { e.preventDefault(); handleReplySubmit(newComment); }}>
             <textarea 
               className="comment-textarea" 
               placeholder="¿Qué opinas?"
@@ -202,35 +243,15 @@ export default function Post() {
           </div>
         )}
 
-        {/* Lista de Comentarios */}
+        {/* Lista de Comentarios RECURSIVA */}
         <div className="comments-list">
-           {comments.map(comment => (
-             <div key={comment._id} className="comment-item">
-                <div className="comment-header">
-                  <Link to={`/profile/${comment.authorId.username}`}>
-                    <img 
-                        src={comment.authorId.avatarUrl || '/icons/surprisedrudo.png'} 
-                        alt="" 
-                        style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} 
-                    />
-                  </Link>
-                  
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                        <Link to={`/profile/${comment.authorId.username}`} className="comment-author">
-                            {comment.authorId.username}
-                        </Link>
-                        <span style={{ color: 'var(--muted-text)', fontSize: '0.8rem' }}>
-                            • {new Date(comment.createdAt).toLocaleDateString()}
-                        </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="comment-body">
-                  {comment.content}
-                </div>
-             </div>
+           {commentTree.map(rootComment => (
+             <CommentItem 
+               key={rootComment._id} 
+               comment={rootComment} 
+               depth={0} // Nivel inicial
+               onReplySubmit={handleReplySubmit} // Pasamos la función manejadora
+             />
            ))}
            
            {comments.length === 0 && (
