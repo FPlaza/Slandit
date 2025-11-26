@@ -6,7 +6,8 @@ import {
   Param, 
   Request, 
   UseGuards, 
-  Patch
+  Patch,
+  Delete
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { PostsService } from './posts.service';
@@ -21,6 +22,12 @@ export class PostsController {
   async create(@Request() req, @Body() createPostDto: CreatePostDto) {
     const authorId = req.user.id;
     return this.postsService.createPost(createPostDto, authorId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('feed') // GET /posts/feed
+  async getFeed(@Request() req) {
+    return this.postsService.getMyFeed(req.user.id);
   }
   
   @Get('subforum/:subforumId')
@@ -45,8 +52,16 @@ export class PostsController {
     return this.postsService.toggleDownvote(id, req.user.id);
   }
 
+  @UseGuards(AuthGuard('jwt'))
+  @Delete(':id')
+  async remove(@Param('id') id: string, @Request() req) {
+    return this.postsService.deletePost(id, req.user.id);
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.postsService.findPostById(id);
   }
+
+
 }

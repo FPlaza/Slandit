@@ -105,4 +105,11 @@ export class ProfilesService {
 
     return profile.save();
   }
+
+  async getJoinedSubforumsIds(userId: string): Promise<any[]> {
+    const profile = await this.profileModel.findById(userId).exec();
+    if (!profile) throw new NotFoundException('Perfil no encontrado');
+    
+    return profile.joinedSubforums || [];
+  }
 }

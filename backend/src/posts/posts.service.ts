@@ -1,5 +1,5 @@
 
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PostDocument, Post } from './entities/post.schema';
@@ -136,6 +136,39 @@ export class PostsService {
       .populate('authorId', '_id username avatarUrl')
       .populate('subforumId', '_id name displayName icon')
       .sort({ createdAt: -1 })
+      .exec();
+  }
+
+  async deletePost(postId: string, userId: string): Promise<{ message: string }> {
+    const post = await this.postModel.findById(postId);
+
+    if (!post) {
+      throw new NotFoundException('Post no encontrado');
+    }
+
+    if (post.authorId !== userId) {
+      throw new UnauthorizedException('No tienes permiso para eliminar este post');
+    }
+
+    await this.postModel.findByIdAndDelete(postId);
+
+    return { message: 'Post eliminado correctamente' };
+  }
+
+  async getMyFeed(userId: string): Promise<PostDocument[]> {
+    const subforumIds = await this.profilesService.getJoinedSubforumsIds(userId);
+
+    if (subforumIds.length === 0) {
+      return [];
+    }
+
+    return this.postModel.find({
+        subforumId: { $in: subforumIds } 
+      })
+      .populate('authorId', '_id username avatarUrl')
+      .populate('subforumId', '_id name displayName icon')
+      .sort({ createdAt: -1 })
+      .limit(50)
       .exec();
   }
 }

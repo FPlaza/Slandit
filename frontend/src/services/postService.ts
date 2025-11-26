@@ -52,5 +52,34 @@ export const postService = {
   async getPostsByUser(userId: string): Promise<Post[]> {
     const response = await axios.get<Post[]>(`${API_URL}/posts/user/${userId}`);
     return response.data;
-  }
+  },
+
+  async deletePost(postId: string): Promise<{ message: string }> {
+    const token = authService.getToken();
+    if (!token) throw new Error('No hay token. No tienes permiso para eliminar.');
+
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+
+    // Usamos axios.delete
+    const response = await axios.delete<{ message: string }>(
+      `${API_URL}/posts/${postId}`, 
+      config
+    );
+    
+    return response.data;
+  },
+
+  async getMyFeed(): Promise<Post[]> {
+    const token = authService.getToken();
+    if (!token) return []; 
+
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+
+    const response = await axios.get<Post[]>(`${API_URL}/posts/feed`, config);
+    return response.data;
+  },
 };
