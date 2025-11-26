@@ -43,4 +43,14 @@ export const postService = {
     const response = await axios.patch<Post>(`${API_URL}/posts/${postId}/downvote`, {}, config);
     return response.data;
   },
+
+  async getPostsBySubforum(subforumId: string): Promise<Post[]> {
+    const response = await axios.get<Post[]>(`${API_URL}/posts/subforum/${subforumId}`);
+    return response.data;
+  },
+
+  async getPostsByUser(userId: string): Promise<Post[]> {
+    const response = await axios.get<Post[]>(`${API_URL}/posts/user/${userId}`);
+    return response.data;
+  }
 };

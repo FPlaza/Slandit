@@ -120,4 +120,22 @@ export class PostsService {
       });
     }
   }
+
+  async findPostsBySubforum(subforumId: string): Promise<PostDocument[]> {
+    return this.postModel
+      .find({ subforumId }) 
+      .populate('authorId', '_id username avatarUrl') 
+      .populate('subforumId', '_id name displayName icon') 
+      .sort({ createdAt: -1 }) 
+      .exec();
+  }
+
+  async findPostsByUser(userId: string): Promise<PostDocument[]> {
+    return this.postModel
+      .find({ authorId: userId }) 
+      .populate('authorId', '_id username avatarUrl')
+      .populate('subforumId', '_id name displayName icon')
+      .sort({ createdAt: -1 })
+      .exec();
+  }
 }

@@ -1,11 +1,11 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Request,
-  UseGuards,
+import { 
+  Controller, 
+  Get, 
+  Post, 
+  Body, 
+  Param, 
+  Request, 
+  UseGuards, 
   Patch
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -18,36 +18,35 @@ export class PostsController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post()
-  async create(
-    @Request() req,
-    @Body() createPostDto: CreatePostDto,
-  ) {
+  async create(@Request() req, @Body() createPostDto: CreatePostDto) {
     const authorId = req.user.id;
     return this.postsService.createPost(createPostDto, authorId);
   }
+  
+  @Get('subforum/:subforumId')
+  async findBySubforum(@Param('subforumId') subforumId: string) {
+    return this.postsService.findPostsBySubforum(subforumId);
+  }
 
-  @Get(':id')
-  async findOne(
-    @Param('id') id: string,
-  ) {
-    return this.postsService.findPostById(id);
+  @Get('user/:userId')
+  async findByUser(@Param('userId') userId: string) {
+    return this.postsService.findPostsByUser(userId);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id/upvote')
-  async upvote(
-    @Param('id') id: string,
-    @Request() req,
-  ) {
+  async upvote(@Param('id') id: string, @Request() req) {
     return this.postsService.toggleUpvote(id, req.user.id);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id/downvote')
-  async downvote(
-    @Param('id') id: string,
-    @Request() req,
-  ) {
+  async downvote(@Param('id') id: string, @Request() req) {
     return this.postsService.toggleDownvote(id, req.user.id);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.postsService.findPostById(id);
   }
 }
