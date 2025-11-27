@@ -20,7 +20,7 @@
     align-items: center;
     padding: 20px;
     border-radius: 12px;
-    background: var(--card-bg);
+    background: var(--profile-card-bg, var(--card-bg));
 }
 
 .profile-avatar {
@@ -107,7 +107,7 @@
     top: -5px;
     right: -10px;
     background: white;
-    border: 1px solid #ccc;
+    border: 1px solid #f1e7ff;
     border-radius: 50%;
     color: #4a4a4a;
     width: 36px;
@@ -224,5 +224,18 @@
     align-items: flex-start;
     padding: 20px;
     border-radius: 12px;
-    background: var(--card-bg);
+    background: var(--profile-card-bg, var(--card-bg));
+}
+
+html[data-theme='dark'] {
+
+  --highlight-bg: rgba(150,100,255,0.06);
+  --primary-color: #d9cfff;              
+  --muted-text: rgba(203,213,225,0.9);
+  --card-border: rgba(79,63,110,0.45);
+}
+
+html[data-theme='light'] {
+  --card-bg: #ffffff;
+  --profile-card-bg: #ecddfa;
 }

@@ -83,8 +83,8 @@
 }
 
 .cp-button-submit {
-    background-color: #420170;
-    color: white;
+    background-color: var(--publish-btn-bg);
+    color: var(--publish-btn-color);
     padding: 12px 20px;
     border-radius: 5px;
     border: none;
@@ -92,9 +92,9 @@
     font-size: 1em;
     width: 100%;
     font-weight: bold;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, box-shadow 0.12s ease;
 }
 
 .cp-button-submit:hover {
-    background-color: #5b0c8f;
+    background-color: var(--publish-btn-hover);
 }

@@ -272,8 +272,8 @@ export default function SubforumPage() {
                 padding: '8px 14px',
                 borderRadius: 8,
                 border: '1px solid rgba(0,0,0,0.08)',
-                background: 'linear-gradient(180deg,var(--accent),#0066cc)',
-                color: 'white',
+                background: 'var(--publish-btn-bg)',
+                color: 'var(--publish-btn-color)',
                 cursor: 'pointer',
                 boxShadow: '0 8px 20px rgba(0,0,0,0.12)'
               }}
@@ -307,7 +307,7 @@ export default function SubforumPage() {
               <button
                 type="submit"
                 disabled={creatingPost}
-                style={{ padding: '8px 12px', borderRadius: 6, border: 'none', background: 'var(--accent)', color: 'white', cursor: creatingPost ? 'not-allowed' : 'pointer' }}
+                style={{ padding: '8px 12px', borderRadius: 6, border: 'none', background: 'var(--publish-btn-bg)', color: 'var(--publish-btn-color)', cursor: creatingPost ? 'not-allowed' : 'pointer' }}
               >
                 {creatingPost ? 'Creando...' : 'Crear publicación'}
               </button>

@@ -13,7 +13,6 @@
   border-right: 5px solid var(--sidebar-border);
   padding-top: 1rem;
 
-  /* 🔥 CORRECCIÓN: CENTRADO + layout en columna */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -57,7 +56,6 @@
 
   width: 100%;
   flex: 1;
-  /* 🔥 Esto permite empujar el botón hacia abajo automáticamente */
 
   display: flex;
   flex-direction: column;
@@ -109,7 +107,6 @@
   transform: scale(1.08);
 }
 
-/* 🔥 CONTENEDOR del botón Cerrar sesión */
 .logout-container {
   width: 100%;
   padding: 12px 0;
@@ -119,7 +116,6 @@
   align-items: center;
 }
 
-/* 🔥 Estilo del botón Cerrar sesión */
 .logout-btn {
   background: #d9534f;
   color: white;

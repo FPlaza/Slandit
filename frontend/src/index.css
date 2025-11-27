@@ -24,21 +24,25 @@ html[data-theme='dark'] {
   --bg: #332F3B;
   --text: rgba(255, 255, 255, 0.87);
   --link: #646cff;
-  --link-hover: #535bf2;
+  --link-hover: #985cc0;
   --button-bg: #1a1a1a;
   --toggle-bg: #ffffff;
   --toggle-fg: #111827;
   --header-bg: #332F3B;
   --header-text: #9664FF;
   --header-border: rgba(79,63,110,0.45);
-  --search-bg: #4c4255;
-  --search-input-bg: #2a0999;
-  --search-input-fg: #9664FF;
+  --search-bg: #51425f;
+  --search-input-bg: #a85ccc8f;
+  --search-input-fg: rgb(233, 197, 240);
+  --search-input-placeholder: rgb(233, 197, 240);
   --sidebar-bg: #332F3B;
   --sidebar-text: #9664FF;
   --sidebar-border: rgba(79,63,110,0.45);
-  --sidebar-toggle-bg: #4d0cff;
+  --sidebar-toggle-bg: #5637ac;
   --sidebar-toggle-fg: #ffffff;
+  --publish-btn-bg: #5637ac;
+  --publish-btn-color: #ffffff;
+  --publish-btn-hover: #3f2a70;
 }
 
 html[data-theme='light'] {
@@ -52,14 +56,18 @@ html[data-theme='light'] {
   --header-bg: #ffffff;
   --header-text: #213547;
   --header-border: rgba(111,75,255,0.18);
-  --search-bg: #f3f4f6;
+  --search-bg: #f7ebfd;
   --search-input-bg: #ffffff;
   --search-input-fg: #213547;
+  --search-input-placeholder: rgba(33,53,71,0.45);
   --sidebar-bg: #ffffff;
   --sidebar-text: #213547;
   --sidebar-border: rgba(111,75,255,0.18);
   --sidebar-toggle-bg: #111827;
   --sidebar-toggle-fg: #ffffff;
+  --publish-btn-bg: #c2a4e6;
+  --publish-btn-color: #ffffff;
+  --publish-btn-hover: var(--link-hover);
 
   /* borde morado sutil en modo claro para mantener consistencia */
   --card-border: rgba(111,75,255,0.12);
