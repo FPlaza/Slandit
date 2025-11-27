@@ -239,3 +239,25 @@ html[data-theme='light'] {
   --card-bg: #ffffff;
   --profile-card-bg: #ecddfa;
 }
+
+/* modo claro — Cancelar (primer botón) */
+html[data-theme='light'] .bio-actions button:first-child,
+html[data-theme='light'] .popup-actions button:first-child {
+  background: #e9c5f7;
+  color: var(--muted-text);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+/* modo claro — Guardar (último botón) */
+html[data-theme='light'] .bio-actions button:last-child,
+html[data-theme='light'] .popup-actions button:last-child {
+  background: var(--link);
+  color: #ffffff;
+  border: 1px solid transparent;
+}
+
+html[data-theme='light'] .bio-actions button:last-child:hover,
+html[data-theme='light'] .popup-actions button:last-child:hover {
+  background: var(--link-hover);
+}
+
