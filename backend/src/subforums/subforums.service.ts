@@ -27,8 +27,13 @@ export class SubforumsService {
       administrator: adminId,
       memberCount: 1,
     });
+    await newSubforum.save();
 
-    return newSubforum.save();
+    await this.profileModel.findByIdAndUpdate(adminId, {
+      $addToSet: { joinedSubforums: newSubforum._id }
+    });
+
+    return newSubforum;
   }
 
   async findSubforumById(id: string): Promise<SubforumDocument>{

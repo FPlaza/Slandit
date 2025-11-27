@@ -75,33 +75,61 @@ export default function Sidebar() {
           <>
             <ul style={{ flexGrow: 1 }}>
               {!user ? (
-                // 🔸 Invitado
+                // 🔸 CASO INVITADO (NO VE EL BOTÓN +)
                 <p style={{ padding: '12px', opacity: 0.75 }}>
                   Inicia sesión para ver tus subforos.
                 </p>
-              ) : joinedSubforums.length === 0 ? (
-                // 🔸 Loggeado, sin subforos
-                <p style={{ padding: '12px', opacity: 0.6 }}>
-                  No estás suscrito a ningún subforo.
-                </p>
               ) : (
-                // 🔸 Loggeado con subforos
-                joinedSubforums.map((sf) => (
-                  <li key={sf._id}>
-                    <button
-                      className="sidebar-link"
-                      onClick={() => navigate(`/subforum/${sf._id}`)}
-                      title={sf.displayName}
-                      aria-label={sf.displayName}
-                    >
-                      <img
-                        src={sf.icon || '/icons/default.png'}
-                        alt={sf.displayName}
-                        className="sidebar-icon large"
-                      />
-                    </button>
-                  </li>
-                ))
+                // 🔸 CASO LOGUEADO (VE LA LISTA Y EL BOTÓN +)
+                <>
+                   {joinedSubforums.length === 0 ? (
+                      <p style={{ padding: '12px', opacity: 0.6 }}>
+                        No estás suscrito a ningún subforo.
+                      </p>
+                   ) : (
+                      joinedSubforums.map((sf) => (
+                        <li key={sf._id}>
+                          <button
+                            className="sidebar-link"
+                            onClick={() => navigate(`/subforum/${sf._id}`)}
+                            title={sf.displayName}
+                          >
+                            <img
+                              src={sf.icon || '/icons/default.png'}
+                              alt={sf.displayName}
+                              className="sidebar-icon large"
+                            />
+                          </button>
+                        </li>
+                      ))
+                   )}
+
+                   {/* ➕ BOTÓN DE CREAR (SOLO AQUÍ DENTRO) */}
+                   <li key="create-new" style={{ marginTop: 12, borderTop: '1px solid var(--card-border)', paddingTop: 12 }}>
+                     <button
+                       className="sidebar-link"
+                       onClick={() => navigate('/create-subforum')}
+                       title="Crear Comunidad"
+                     >
+                       <div style={{
+                         width: 48,
+                         height: 48,
+                         borderRadius: 12,
+                         background: 'var(--card-bg)',
+                         border: '2px dashed var(--muted-text)',
+                         display: 'flex',
+                         alignItems: 'center',
+                         justifyContent: 'center',
+                         color: 'var(--muted-text)',
+                         fontSize: 24,
+                         cursor: 'pointer',
+                         transition: 'all 0.2s'
+                       }}>
+                         +
+                       </div>
+                     </button>
+                   </li>
+                </>
               )}
             </ul>
 
