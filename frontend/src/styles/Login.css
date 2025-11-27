@@ -16,7 +16,7 @@
 }
 
 .login-card h2 {
-    color: black;
+    color: rgb(255, 255, 255);
     margin-top: 0;
     margin-bottom: 30px;
 }
@@ -58,7 +58,7 @@
 
 .login-button {
     background-color: #420170;
-    color: black;
+    color: #ffffff;
     padding: 12px 20px;
     border-radius: 5px;
     border: none;

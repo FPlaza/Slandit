@@ -240,7 +240,7 @@ export default function SubforumPage() {
           <div style={{ flex: 1 }}>
             <h1 style={{ margin: 0 }}>{subforum.displayName}</h1>
             <p style={{ margin: '6px 0', color: 'var(--muted-text)' }}>
-              r/{subforum.name} • {subforum.memberCount} miembros
+              s/{subforum.name} • {subforum.memberCount} miembros
             </p>
             <p>{subforum.description}</p>
           </div>
@@ -254,8 +254,8 @@ export default function SubforumPage() {
                 borderRadius: 8,
                 border: 'none',
                 cursor: processingJoin ? 'not-allowed' : 'pointer',
-                background: isMember ? 'var(--muted-text)' : 'var(--accent)',
-                color: 'white',
+                background: isMember ? 'var(--muted-text)' : 'var(--icon-fg)',
+                color: 'var(--button-bg)',
                 boxShadow: '0 6px 14px rgba(0,0,0,0.08)'
               }}
             >

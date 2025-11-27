@@ -131,7 +131,7 @@ const PostCard: React.FC<Props> = ({ post }) => {
             style={{ width: 24, height: 24, borderRadius: 4, objectFit: 'cover' }}
           />
           <Link to={`/subforum/${post.subforumId._id}`} style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'none' }}>
-            r/{post.subforumId.name}
+            s/{post.subforumId.name}
           </Link>
 
           <span>• por</span>

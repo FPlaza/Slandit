@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { profileService } from '../services/profileService';
+import { postService } from '../services/postService'; // <-- Importar servicio
 import PostCard from '../components/PostCard';
-import { mockPosts } from '../mocks/mockData';
 import '../styles/Profile.css';
 import type { Profile } from '../types/profile.types';
+import type { Post } from '../types/post.types'; // <-- Importar tipo Post
 
 export default function GuestProfile() {
-    const { username } = useParams(); // ← username del invitado
+    const { username } = useParams();
     const [profile, setProfile] = useState<Profile | null>(null);
+    const [posts, setPosts] = useState<Post[]>([]); // <-- Estado para posts reales
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -16,10 +18,18 @@ export default function GuestProfile() {
             try {
                 if (!username) return;
 
+                // 1. Cargar el Perfil
                 const p = await profileService.getProfileByUsername(username);
                 setProfile(p);
+
+                // 2. Cargar los Posts reales de este usuario
+                // Usamos p._id (el UUID) para buscar sus posts
+                const userPosts = await postService.getPostsByUser(p._id);
+                setPosts(userPosts);
+
             } catch (err) {
                 console.error("Error cargando perfil invitado:", err);
+                setProfile(null);
             } finally {
                 setLoading(false);
             }
@@ -31,11 +41,6 @@ export default function GuestProfile() {
     if (loading) return <div className="loading">Cargando perfil...</div>;
 
     if (!profile) return <div className="error">No se encontró este perfil.</div>;
-
-    // Filtrar posts mock por username
-    const posts = mockPosts.filter(
-        (p) => p.author.username.toLowerCase() === profile.username.toLowerCase()
-    );
 
     return (
         <main className="profile-main">
@@ -69,7 +74,8 @@ export default function GuestProfile() {
                     ) : (
                         <div className="posts-list">
                             {posts.map((p) => (
-                                <PostCard key={p.id} post={p} />
+                                // Usamos p._id ya que es un Post real
+                                <PostCard key={p._id} post={p} />
                             ))}
                         </div>
                     )}
