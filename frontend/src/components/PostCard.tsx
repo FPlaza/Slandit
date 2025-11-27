@@ -16,9 +16,13 @@ const PostCard: React.FC<Props> = ({ post }) => {
   const navigate = useNavigate();
   const currentUser = authService.getUser();
 
+  const isAuthor = currentUser?.username === post.authorId.username;
+  const profileLink = isAuthor 
+    ? `/profile/${post.authorId.username}` 
+    : `/guest-profile/${post.authorId.username}`;
+
   // 3. Lógica de autor (Usando los campos reales populados)
   // post.authorId es un OBJETO completo gracias a .populate()
-  const isAuthor = currentUser && currentUser.username === post.authorId.username;
 
   useEffect(() => {
     if (!currentUser) {
@@ -33,7 +37,7 @@ const PostCard: React.FC<Props> = ({ post }) => {
       setUserVote(null);
     }
     setScore(post.voteScore);
-  }, [post, currentUser]);
+  }, [post._id, currentUser]);
 
   const handleUp = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -44,6 +48,9 @@ const PostCard: React.FC<Props> = ({ post }) => {
       setScore(updated.voteScore);
       if (updated.upvotedBy.includes(currentUser.id)) setUserVote('up');
       else setUserVote(null);
+      window.dispatchEvent(new CustomEvent('post-updated', { 
+        detail: updated 
+      }));
     } catch (err) {
       console.error('Error upvoting:', err);
     }
@@ -57,6 +64,9 @@ const PostCard: React.FC<Props> = ({ post }) => {
       setScore(updated.voteScore);
       if (updated.downvotedBy.includes(currentUser.id)) setUserVote('down');
       else setUserVote(null);
+      window.dispatchEvent(new CustomEvent('post-updated', { 
+        detail: updated 
+      }));
     } catch (err) {
       console.error('Error downvoting:', err);
     }
@@ -126,7 +136,7 @@ const PostCard: React.FC<Props> = ({ post }) => {
 
           <span>• por</span>
 
-          <Link to={`/profile/${post.authorId.username}`} style={{ color: 'var(--muted-text)', textDecoration: 'none' }}>
+          <Link to={profileLink} style={{ color: 'var(--muted-text)', textDecoration: 'none' }}>
             @{post.authorId.username}
           </Link>
 

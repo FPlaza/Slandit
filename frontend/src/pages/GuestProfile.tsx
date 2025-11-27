@@ -44,7 +44,7 @@ export default function GuestProfile() {
                 <section className="profile-card">
                     <div className="avatar-container">
                         <img
-                            src={profile.avatarUrl || '/icons/default-avatar.png'}
+                            src={profile.avatarUrl || '/icons/surprisedrudo.png'}
                             alt={profile.username}
                             className="profile-avatar"
                         />

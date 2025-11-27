@@ -16,7 +16,10 @@ export default function SubforumPostCard({ post }: Props) {
   // Obtenemos el usuario actual para saber si ya votó
   const currentUser = authService.getUser();
   // Normalizamos el id del autor (soporta populated doc o string)
-  const authorId = (post.authorId as any)?._id || (post.authorId as any).id || (post.authorId as any) || null;
+  const isAuthor = currentUser?.username === post.authorId.username;
+  const profileLink = isAuthor 
+      ? `/profile/${post.authorId.username}` 
+      : `/guest-profile/${post.authorId.username}`;
 
   // 2. Calcular estado inicial basado en datos reales de Mongo
   // Dependemos solo de `post._id` para evitar sobrescribir el score
@@ -182,7 +185,7 @@ export default function SubforumPostCard({ post }: Props) {
         <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 8 }}>
           
           {/* Avatar del Autor (Usando authorId populado) */}
-          <Link to={`/guest-profile/${post.authorId.username}`} style={{ display: 'inline-block' }}>
+          <Link to={profileLink} style={{ display: 'inline-block' }}>
             <img 
               src={post.authorId.avatarUrl || '/icons/surprisedrudo.png'} 
               alt={post.authorId.username} 
@@ -193,7 +196,7 @@ export default function SubforumPostCard({ post }: Props) {
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ fontSize: 14, color: 'var(--muted-text)' }}>
               {/* Link al Perfil */}
-              por <Link to={`/guest-profile/${post.authorId.username}`} style={{ color: 'var(--muted-text)', textDecoration: 'none', fontWeight: 500 }}>
+              por <Link to={profileLink} style={{ color: 'var(--muted-text)', textDecoration: 'none', fontWeight: 500 }}>
                 @{post.authorId.username}
               </Link>
             </div>
@@ -215,7 +218,7 @@ export default function SubforumPostCard({ post }: Props) {
           <span>•</span>
           <span>{new Date(post.createdAt).toLocaleString()}</span>
           {/* Mostrar botón eliminar solo al autor */}
-          {currentUser && authorId && currentUser.id === String(authorId) && (
+          {isAuthor && (
             <button
               onClick={handleDelete}
               style={{ marginLeft: 'auto', padding: '6px 10px', borderRadius: 6, border: 'none', cursor: 'pointer', background: '#e53935', color: '#fff', fontSize: 13 }}

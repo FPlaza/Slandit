@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { profileService } from '../services/profileService';
 import PostCard from '../components/PostCard';
 import { mockPosts } from '../mocks/mockData';
+import { imageService } from '../services/imageService';
 import '../styles/Profile.css';
 
 function Profile() {
@@ -14,6 +15,9 @@ function Profile() {
 
   const [newAvatar, setNewAvatar] = useState('');
   const [newBio, setNewBio] = useState('');
+
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [savingAvatar, setSavingAvatar] = useState(false);
 
   // Cargar MI perfil real
   useEffect(() => {
@@ -70,24 +74,66 @@ function Profile() {
             {isEditingAvatar && (
               <div className="avatar-edit-popup">
                 <label>
-                  Nueva URL de avatar:
+                  Subir nueva imagen:
+                  {/* Input de archivo en lugar de texto */}
                   <input
-                    type="text"
-                    value={newAvatar}
-                    onChange={(e) => setNewAvatar(e.target.value)}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                            setAvatarFile(file);
+                            // Previsualización inmediata
+                            setNewAvatar(URL.createObjectURL(file));
+                        }
+                    }}
+                    style={{ marginTop: 8 }}
                   />
                 </label>
 
                 <div className="popup-actions">
-                  <button onClick={() => setIsEditingAvatar(false)}>Cancelar</button>
-                  <button
-                    onClick={async () => {
-                      await profileService.updateMyProfile({ avatarUrl: newAvatar });
-                      setProfile({ ...profile, avatarUrl: newAvatar });
+                  <button onClick={() => {
                       setIsEditingAvatar(false);
+                      setNewAvatar(profile.avatarUrl || ''); // Revertir si cancela
+                      setAvatarFile(null);
+                  }}>
+                    Cancelar
+                  </button>
+                  
+                  <button
+                    disabled={savingAvatar}
+                    onClick={async () => {
+                      setSavingAvatar(true);
+                      try {
+                          let finalUrl = newAvatar;
+                          
+                          // 1. Si hay archivo, subirlo a Supabase
+                          if (avatarFile) {
+                              const uploadedUrl = await imageService.uploadImage(avatarFile, 'avatars');
+                              if (uploadedUrl) finalUrl = uploadedUrl;
+                          }
+
+                          // 2. Guardar URL en Backend
+                          await profileService.updateMyProfile({ avatarUrl: finalUrl });
+                          
+                          // 3. Actualizar estado local
+                          setProfile({ ...profile, avatarUrl: finalUrl });
+                          setNewAvatar(finalUrl); // Confirmar cambio
+                          setIsEditingAvatar(false);
+                          setAvatarFile(null);
+                          
+                          // 4. (Opcional) Disparar evento para actualizar Header/Sidebar
+                          // window.dispatchEvent(new Event("auth-changed")); 
+
+                      } catch (error) {
+                          console.error("Error guardando avatar:", error);
+                          alert("Error al subir la imagen");
+                      } finally {
+                          setSavingAvatar(false);
+                      }
                     }}
                   >
-                    Guardar
+                    {savingAvatar ? 'Guardando...' : 'Guardar'}
                   </button>
                 </div>
               </div>
