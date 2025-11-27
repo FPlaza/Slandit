@@ -114,7 +114,7 @@ export default function CreateSubforum() {
           <div className="form-group">
             <label>Nombre del subforo <span className="required">*</span></label>
             <div className="input-prefix-wrapper">
-              <span className="prefix">r/</span>
+              <span className="prefix">s/</span>
               <input 
                 type="text" 
                 value={name} 

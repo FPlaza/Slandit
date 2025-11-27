@@ -5,6 +5,7 @@ import { Subforum, SubforumDocument } from './entities/subforums.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Profile, ProfileDocument } from '../profiles/entities/profile.schema';
+import { ProfilesService } from 'src/profiles/profiles.service';
 
 @Injectable()
 export class SubforumsService {
@@ -12,15 +13,25 @@ export class SubforumsService {
     @InjectModel(Subforum.name)
     private subforumModel: Model<SubforumDocument>,
     @InjectModel(Profile.name)
-    private profileModel: Model<ProfileDocument>
+    private profileModel: Model<ProfileDocument>,
+    private readonly profilesService: ProfilesService,
   ){}
 
   async createSubforum(adminId: string, createSubforumDto: CreateSubforumDto): Promise<SubforumDocument> {
+    const profile = await this.profileModel.findById(adminId);
+    if (!profile) throw new NotFoundException('Perfil no encontrado');
+
+    if (profile.currency < 500) {
+        throw new ConflictException('No tienes suficientes monedas (500) para crear un subforo.');
+    }
+    
     const existing = await this.subforumModel.findOne({ name: createSubforumDto.name }).exec();
     
     if (existing) {
       throw new ConflictException(`El nombre "${createSubforumDto.name}" ya está en uso.`);
     }
+
+    await this.profilesService.addCurrency(adminId, -500);
 
     const newSubforum = new this.subforumModel({
       ...createSubforumDto,
