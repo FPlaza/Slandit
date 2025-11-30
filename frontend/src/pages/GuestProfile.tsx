@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { profileService } from '../services/profileService';
-import { postService } from '../services/postService'; // <-- Importar servicio
+import { postService } from '../services/postService';
 import PostCard from '../components/PostCard';
 import '../styles/Profile.css';
 import type { Profile } from '../types/profile.types';
-import type { Post } from '../types/post.types'; // <-- Importar tipo Post
+import type { Post } from '../types/post.types';
 
 export default function GuestProfile() {
     const { username } = useParams();
     const [profile, setProfile] = useState<Profile | null>(null);
-    const [posts, setPosts] = useState<Post[]>([]); // <-- Estado para posts reales
+    const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -18,12 +18,9 @@ export default function GuestProfile() {
             try {
                 if (!username) return;
 
-                // 1. Cargar el Perfil
                 const p = await profileService.getProfileByUsername(username);
                 setProfile(p);
 
-                // 2. Cargar los Posts reales de este usuario
-                // Usamos p._id (el UUID) para buscar sus posts
                 const userPosts = await postService.getPostsByUser(p._id);
                 setPosts(userPosts);
 
@@ -74,7 +71,6 @@ export default function GuestProfile() {
                     ) : (
                         <div className="posts-list">
                             {posts.map((p) => (
-                                // Usamos p._id ya que es un Post real
                                 <PostCard key={p._id} post={p} />
                             ))}
                         </div>

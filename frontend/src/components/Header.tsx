@@ -20,7 +20,6 @@ export default function Header() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  // 🔥 Escucha cambios de login/logout
   useEffect(() => {
     const updateUser = () => {
       setUser(authService.getUser());
@@ -54,7 +53,6 @@ export default function Header() {
   useEffect(() => {
     if (user) {
       loadUnreadCount();
-      // Opcional: Polling cada 60s para actualizar el numerito
       const interval = setInterval(loadUnreadCount, 60000);
       return () => clearInterval(interval);
     }
@@ -122,7 +120,7 @@ export default function Header() {
         className="header-inner"
         style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}
       >
-        {/* LOGO */}
+        {/* logo */}
         <img
           src={LogoSlandit}
           alt="Slandit"
@@ -143,14 +141,14 @@ export default function Header() {
       </div>
 
       <nav className="header-nav-icons">
-        {/* 🔎 Buscar siempre visible */}
+        {/* buscar siempre visible */}
         <button className="icon-btn" title="Buscar" onClick={handleSearch}>
           {showSearch ? <MdClose size={24} /> : <MdSearch size={24} />}
         </button>
 
         {user ? (
           <>
-            {/* 🔔 NOTIFICACIONES */}
+            {/* notis */}
             <div className="notification-wrapper" style={{ position: 'relative' }}>
               
               <button
@@ -161,7 +159,7 @@ export default function Header() {
               >
                 <MdNotifications size={24} />
                 
-                {/* La Burbuja Roja (Solo si hay > 0) */}
+                {/* si hay notis */}
                 {unreadCount > 0 && (
                   <span className="notification-badge">
                     {unreadCount > 9 ? '9+' : unreadCount}
@@ -169,7 +167,7 @@ export default function Header() {
                 )}
               </button>
 
-              {/* El Menú Desplegable (Solo si showNotifications es true) */}
+              {/* menu desplegable */}
               {showNotifications && (
                 <div className="notifications-dropdown">
                   <h4 className="notif-header">Notificaciones</h4>
@@ -181,7 +179,6 @@ export default function Header() {
                       {notifications.map((notif) => (
                         <li 
                           key={notif._id} 
-                          // Clase diferente si no está leída (para ponerle fondo azulito)
                           className={`notif-item ${!notif.read ? 'unread' : ''}`}
                           onClick={() => handleNotificationClick(notif)}
                         >
@@ -197,7 +194,7 @@ export default function Header() {
               )}
             </div>
 
-            {/* 👤 PERFIL */}
+            {/* profile */}
             <button
               className="icon-btn"
               title="Perfil"
@@ -208,7 +205,7 @@ export default function Header() {
           </>
         ) : (
           <>
-            {/* 🔐 INVITADO → BOTÓN DE LOGIN */}
+            {/* boton pa iniciar */}
             <button
               className="login-btn"
               onClick={() => navigate('/login')}
@@ -228,18 +225,17 @@ export default function Header() {
             placeholder="Buscar subforos o usuarios..."
             className="search-input"
             autoFocus
-            // Conectamos el estado
             value={query} 
             onChange={(e) => setQuery(e.target.value)}
           />
 
-          {/* --- AQUÍ EMPIEZA LA LISTA DE RESULTADOS --- */}
+          {/* aqui los resultados de busquedas */}
           {(results || isSearching) && (
             <div className="search-results-dropdown">
                 
                 {isSearching && <div className="search-item-loading" style={{padding: 10, color: 'var(--muted-text)'}}>Buscando...</div>}
 
-                {/* RESULTADOS DE SUBFOROS */}
+                {/* solo pa subforos */}
                 {results?.subforums && results.subforums.length > 0 && (
                     <div className="search-section">
                         <h4 style={{padding: '8px 12px', margin: 0, fontSize: '0.85rem', color: 'var(--muted-text)', background: 'rgba(0,0,0,0.05)'}}>Comunidades</h4>
@@ -260,7 +256,7 @@ export default function Header() {
                     </div>
                 )}
 
-                {/* RESULTADOS DE USUARIOS */}
+                {/* solo pa usuarios */}
                 {results?.users && results.users.length > 0 && (
                     <div className="search-section">
                         <h4 style={{padding: '8px 12px', margin: 0, fontSize: '0.85rem', color: 'var(--muted-text)', background: 'rgba(0,0,0,0.05)'}}>Usuarios</h4>
@@ -268,7 +264,6 @@ export default function Header() {
                             <div 
                                 key={u._id} 
                                 className="search-result-item"
-                                // Lógica para ir a mi perfil o perfil de invitado
                                 onClick={() => handleNavigate(user?.username === u.username ? `/profile/${u.username}` : `/guest-profile/${u.username}`)}
                                 style={{display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', cursor: 'pointer'}}
                             >
@@ -279,13 +274,13 @@ export default function Header() {
                     </div>
                 )}
 
-                {/* MENSAJE DE NO RESULTADOS */}
+                {/* si es q no encuentra nada */}
                 {!isSearching && results && results.subforums.length === 0 && results.users.length === 0 && (
                     <div style={{padding: 20, textAlign: 'center', color: 'var(--muted-text)'}}>No se encontraron resultados</div>
                 )}
             </div>
           )}
-          {/* --- FIN DE LA LISTA --- */}
+          {/* fin de la funcion */}
 
         </div>
       )}

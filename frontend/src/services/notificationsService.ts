@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { authService } from './authService';
-// Necesitarás crear este archivo de tipos (ver abajo)
 import type { Notification } from '../types/notification.types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';

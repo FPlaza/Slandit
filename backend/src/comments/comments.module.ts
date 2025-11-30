@@ -11,7 +11,7 @@ import { NotificationsModule } from 'src/notifications/notifications.module';
   imports: [
     MongooseModule.forFeature([
       { name: Comment.name, schema: CommentSchema },
-      { name: Post.name, schema: PostSchema }, // <-- ¡Importante!
+      { name: Post.name, schema: PostSchema },
     ]),
     ProfilesModule,
     NotificationsModule,

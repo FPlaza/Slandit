@@ -12,13 +12,13 @@ export const imageService = {
    */
   async uploadImage(file: File, folder: string): Promise<string | null> {
     try {
-      // 1. Limpiar el nombre del archivo y hacerlo único
+      // limpia el nombre del archivo pa hacerlo único
       // (Evita que dos usuarios suban 'image.jpg' y se sobrescriban)
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
       const filePath = `${folder}/${fileName}`;
 
-      // 2. Subir a Supabase Storage
+      // subirlo a Supabase Storage
       const { error: uploadError } = await supabase
         .storage
         .from(BUCKET_NAME)
@@ -32,7 +32,7 @@ export const imageService = {
         throw uploadError;
       }
 
-      // 3. Obtener la URL pública para guardarla en Mongo
+      // obtener la URL pública para guardarla en Mongo
       const { data } = supabase
         .storage
         .from(BUCKET_NAME)

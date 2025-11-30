@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// 1. Importar el tipo REAL (Post) y borrar MockPost
 import type { Post } from '../types/post.types'; 
 import { postService } from '../services/postService';
 import { authService } from '../services/authService';
 
-// 2. Actualizar las Props
 type Props = { post: Post };
 
 type VoteStatus = 'up' | 'down' | null;
@@ -21,8 +19,6 @@ const PostCard: React.FC<Props> = ({ post }) => {
     ? `/profile/${post.authorId.username}` 
     : `/guest-profile/${post.authorId.username}`;
 
-  // 3. Lógica de autor (Usando los campos reales populados)
-  // post.authorId es un OBJETO completo gracias a .populate()
 
   useEffect(() => {
     if (!currentUser) {
@@ -99,7 +95,7 @@ const PostCard: React.FC<Props> = ({ post }) => {
       }}
       onClick={() => navigate(`/posts/${post._id}`)}
     >
-      {/* VOTOS */}
+      {/* up o downvotes */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 40 }} onClick={e => e.stopPropagation()}>
         <button
           className={`vote-btn up ${userVote === 'up' ? 'active' : ''}`}
@@ -118,13 +114,13 @@ const PostCard: React.FC<Props> = ({ post }) => {
         </button>
       </div>
 
-      {/* CONTENIDO */}
+      {/* contenido publi */}
       <div style={{ flex: 1 }}>
         <div
           style={{ fontSize: 12, color: 'var(--muted-text)', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}
           onClick={e => e.stopPropagation()}
         >
-          {/* 4. USAR DATOS REALES (subforumId.icon, authorId.username, etc.) */}
+          {/* dejamos d usar mocks */}
           <img
             src={post.subforumId.icon || '/icons/default.png'}
             alt=""

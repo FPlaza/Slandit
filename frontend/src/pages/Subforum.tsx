@@ -1,15 +1,15 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import { subforumService } from '../services/subforumService';
-import { postService } from '../services/postService'; // Necesitas este para los posts
+import { postService } from '../services/postService';
 import { authService } from '../services/authService';
 import { profileService } from '../services/profileService';
 import type { Subforum } from '../types/subforum.types';
 import type { Post } from '../types/post.types';
-import SubforumPostCard from '../components/SubforumPostCard'; // Asegúrate que este componente acepte el tipo 'Post' real
+import SubforumPostCard from '../components/SubforumPostCard';
 
 export default function SubforumPage() {
-  const { id } = useParams(); // Este 'id' ahora es el _id de Mongo (ej: 654...)
+  const { id } = useParams();
   
   const [subforum, setSubforum] = useState<Subforum | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -27,26 +27,21 @@ export default function SubforumPage() {
     const loadData = async () => {
       setLoading(true);
       try {
-        // 1. Cargar la info del Subforo
         const subData = await subforumService.getSubforumById(id);
         setSubforum(subData);
 
-        // 2. Cargar los posts de ese subforo (Usando el endpoint nuevo que creamos)
         const postsData = await postService.getPostsBySubforum(id);
         setPosts(postsData);
 
-        // Determinar si el usuario actual es miembro.
-        // Preferimos pedir el perfil real al backend si hay token, para evitar desincronías.
+        // ver si el usuario actual es miembro esto pidiendo el token al backend
         const token = authService.getToken();
         if (token) {
           try {
             const profile = await profileService.getMyProfile();
-            // Guardamos la versión actualizada en localStorage para que Sidebar y demás la usen
             localStorage.setItem('user', JSON.stringify(profile));
             const found = Array.isArray(profile.joinedSubforums) && profile.joinedSubforums.some((s: any) => s._id === id || s.id === id);
             setIsMember(!!found);
           } catch (err) {
-            // Si falla la petición del perfil, fallback a lo que haya en localStorage
             const currentUser = authService.getUser();
             if (currentUser && currentUser.joinedSubforums) {
               const found = (currentUser.joinedSubforums as any[]).some((s) => s._id === id || s.id === id);
@@ -67,7 +62,6 @@ export default function SubforumPage() {
 
       } catch (err) {
         console.error("Error cargando subforo:", err);
-        // Aquí podrías redirigir a 404 si quieres
       } finally {
         setLoading(false);
       }
@@ -76,7 +70,6 @@ export default function SubforumPage() {
     loadData();
   }, [id]);
 
-  // Escuchamos eventos globales de post actualizado para mantener el listado sincronizado
   useEffect(() => {
     const handler = (e: Event) => {
       try {
@@ -100,7 +93,7 @@ export default function SubforumPage() {
           });
         });
       } catch (err) {
-        // ignore
+        // ignoramos aca
       }
     };
 
@@ -108,7 +101,6 @@ export default function SubforumPage() {
     return () => window.removeEventListener('post-updated', handler as EventListener);
   }, []);
 
-  // Escuchamos post-deleted para remover posts de esta lista cuando se borran
   useEffect(() => {
     const delHandler = (e: Event) => {
       try {
@@ -122,7 +114,7 @@ export default function SubforumPage() {
           return !(pid === removedId || String(pid) === String(removedId));
         }));
       } catch (err) {
-        // ignore
+        // ignoramos aca
       }
     };
 
@@ -130,7 +122,6 @@ export default function SubforumPage() {
     return () => window.removeEventListener('post-deleted', delHandler as EventListener);
   }, []);
 
-  // Handler para Unirse / Salir del subforo
   const toggleJoin = async () => {
     const user = authService.getUser();
     if (!user) return alert('Inicia sesión para unirte a comunidades');
@@ -156,13 +147,10 @@ export default function SubforumPage() {
         // Avisamos a la app que el auth/user cambió para que Sidebar y otros reaccionen
         window.dispatchEvent(new Event('auth-changed'));
       } catch (err) {
-        // Si falló obtener perfil, aún así actualizamos localStorage mínimamente
         const current = authService.getUser();
         if (current) {
-          // añadimos o removemos el subforum en la copia local
           const joined = Array.isArray(current.joinedSubforums) ? [...current.joinedSubforums] : [];
           if (isMember) {
-            // ya seteado a false arriba -> removemos
             const idx = joined.findIndex((s: any) => s._id === id || s.id === id);
             if (idx >= 0) joined.splice(idx, 1);
           } else {
@@ -182,7 +170,7 @@ export default function SubforumPage() {
     }
   };
 
-  // Handler para crear nueva publicación dentro del subforo
+  // evento pa crear nueva publicación dentro del subforo
   const handleCreatePost = async (e?: FormEvent) => {
     if (e) e.preventDefault();
     const token = authService.getToken();
@@ -194,11 +182,10 @@ export default function SubforumPage() {
     try {
       const created = await postService.createPost({ title: newTitle.trim(), content: newContent.trim(), subforumId: id });
       console.log('Post creado (server response):', created);
-      // Refrescar posts para obtener la versión populada
+      // refrescar posts para obtener la versión nueva cN el post creado
       const postsData = await postService.getPostsBySubforum(id);
       setPosts(postsData);
 
-      // Emitimos evento para sincronizar otras páginas (feed, etc.) con el post nuevo
       try {
         const detail = { ...(created as any), id: (created as any)._id || (created as any).id };
         window.dispatchEvent(new CustomEvent('post-updated', { detail }));
@@ -226,10 +213,10 @@ export default function SubforumPage() {
   return (
     <main style={{ padding: 20, maxWidth: 980, margin: '0 auto' }}>
       
-      {/* HEADER DEL SUBFORO */}
+      {/* header subforo */}
       <header style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 18, justifyContent: 'space-between' }}>
-        {/* Banner (Opcional, si quieres mostrarlo arriba) */}
-        {/* {subforum.banner && <img src={subforum.banner} ... />} */}
+        {/* Banner de este */}
+        {/* en desarrollo */}
 
         <img 
           src={subforum.icon || '/icons/default.png'} 
@@ -284,8 +271,8 @@ export default function SubforumPage() {
         </div>
       </header>
 
-      {/* LISTA DE POSTS */}
-      {/* FORMULARIO PARA CREAR POST (mostrado tras pulsar Publicar en header) */}
+      {/* lista de los post */}
+      {/* yy aca pa crear uno */}
       {showCreate && (
         <section style={{ marginBottom: 18 }}>
           <form onSubmit={handleCreatePost} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

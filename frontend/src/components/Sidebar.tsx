@@ -23,22 +23,16 @@ export default function Sidebar() {
       setJoinedSubforums(profile.joinedSubforums || []);
     } catch (err) {
       console.error("Error cargando subforos:", err);
-      // Si falla (ej: token expirado), podríamos hacer logout automático
-      // authService.logout(); 
     }
   };
 
-  /** 🔥 Detecta login/logout automáticamente */
   useEffect(() => {
-    // 1. Cargar al inicio (si hay usuario/token)
     loadSubforums();
 
-    // 2. Suscribirse a cambios de login/logout
     const handleAuthChange = () => {
       const currentUser = authService.getUser();
       setUser(currentUser);
       
-      // Si se logueó, cargamos. Si salió, limpiamos.
       if (currentUser) {
         loadSubforums();
       } else {
@@ -51,11 +45,10 @@ export default function Sidebar() {
   }, []);
 
 
-  /** 🚪 Logout */
   const handleLogout = () => {
     authService.logout();
     window.dispatchEvent(new Event("auth-changed"));
-    navigate("/"); // opcional: enviar al home
+    navigate("/");
   };
 
   return (
@@ -75,12 +68,10 @@ export default function Sidebar() {
           <>
             <ul style={{ flexGrow: 1 }}>
               {!user ? (
-                // 🔸 CASO INVITADO (NO VE EL BOTÓN +)
                 <p style={{ padding: '12px', opacity: 0.75 }}>
                   Inicia sesión para ver tus subforos.
                 </p>
               ) : (
-                // 🔸 CASO LOGUEADO (VE LA LISTA Y EL BOTÓN +)
                 <>
                    {joinedSubforums.length === 0 ? (
                       <p style={{ padding: '12px', opacity: 0.6 }}>
@@ -104,7 +95,7 @@ export default function Sidebar() {
                       ))
                    )}
 
-                   {/* ➕ BOTÓN DE CREAR (SOLO AQUÍ DENTRO) */}
+                   {/* boton pa crear subforo */}
                    <li key="create-new" style={{ marginTop: 12, borderTop: '1px solid var(--card-border)', paddingTop: 12 }}>
                      <button
                        className="sidebar-link"
@@ -133,7 +124,7 @@ export default function Sidebar() {
               )}
             </ul>
 
-            {/* 🚪 BOTÓN DE CERRAR SESIÓN (solo si hay usuario) */}
+            {/* deslogeo */}
             {user && (
               <div className="logout-container">
                 <button

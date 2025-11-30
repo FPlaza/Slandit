@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react';
 import { profileService } from '../services/profileService';
-import { imageService } from '../services/imageService'; // <-- Importar
-import { postService } from '../services/postService'; // <-- Importar
+import { imageService } from '../services/imageService';
+import { postService } from '../services/postService';
 import PostCard from '../components/PostCard';
-// 1. BORRAR import { mockPosts }
 import type { Profile as ProfileType } from '../types/profile.types';
-import type { Post } from '../types/post.types'; // <-- Usar tipo REAL
+import type { Post } from '../types/post.types';
 import '../styles/Profile.css';
 
 function Profile() {
   const [profile, setProfile] = useState<ProfileType | null>(null);
-  // 2. Cambiar estado de posts para usar el tipo real
   const [posts, setPosts] = useState<Post[]>([]); 
   const [loading, setLoading] = useState(true);
 
@@ -25,18 +23,15 @@ function Profile() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [savingAvatar, setSavingAvatar] = useState(false);
 
-  // Cargar MI perfil real y MIS posts reales
+  // cargar mi perfil cn mis posts
   useEffect(() => {
     async function loadData() {
       try {
-        // A. Obtener Perfil
         const p = await profileService.getMyProfile();
         setProfile(p);
         setNewAvatar(p.avatarUrl || '');
         setNewBio(p.bio || '');
 
-        // B. Obtener Posts del Usuario (Usando el ID del perfil)
-        // Usamos p._id (el UUID de Postgres)
         const userPosts = await postService.getPostsByUser(p._id);
         setPosts(userPosts);
 
@@ -62,7 +57,7 @@ function Profile() {
     <main className="profile-main">
       <div className="profile-wrapper">
 
-        {/* CARD DEL PERFIL */}
+        {/* div del perfil */}
         <section className="profile-card">
 
           <div className="avatar-container">
@@ -80,7 +75,7 @@ function Profile() {
               ✏️
             </button>
 
-            {/* POPUP DE EDICIÓN DE AVATAR */}
+            {/* editar avatar */}
             {isEditingAvatar && (
               <div className="avatar-edit-popup">
                 <label>
@@ -92,7 +87,7 @@ function Profile() {
                         const file = e.target.files?.[0];
                         if (file) {
                             setAvatarFile(file);
-                            setNewAvatar(URL.createObjectURL(file)); // Preview
+                            setNewAvatar(URL.createObjectURL(file));
                         }
                     }}
                     style={{ marginTop: 8, width: '100%' }}
@@ -102,7 +97,7 @@ function Profile() {
                 <div className="popup-actions">
                   <button onClick={() => {
                       setIsEditingAvatar(false);
-                      setNewAvatar(profile.avatarUrl || ''); // Revertir
+                      setNewAvatar(profile.avatarUrl || '');
                       setAvatarFile(null);
                   }}>
                     Cancelar
@@ -127,7 +122,6 @@ function Profile() {
                           setIsEditingAvatar(false);
                           setAvatarFile(null);
                           
-                          // Actualizar UI global si es necesario
                           window.dispatchEvent(new Event("auth-changed")); 
 
                       } catch (error) {
@@ -145,7 +139,7 @@ function Profile() {
             )}
           </div>
 
-          {/* INFO + DIVISAS */}
+          {/* detalles y divisas */}
           <div className="profile-details-wrapper">
             <div className="profile-info">
               <h2 className="profile-username">@{profile.username}</h2>
@@ -201,7 +195,7 @@ function Profile() {
           </button>
         </section>
 
-        {/* POSTS REALES */}
+        {/* post del usuario */}
         <section>
           <h3 className="posts-title">Publicaciones recientes</h3>
 
@@ -212,7 +206,6 @@ function Profile() {
           ) : (
             <div className="posts-list">
               {posts.map((p) => (
-                // 3. AHORA SÍ: 'p' es de tipo 'Post' y tiene '_id'
                 <PostCard key={p._id} post={p} />
               ))}
             </div>

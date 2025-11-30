@@ -19,7 +19,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Theme overrides by data attribute on <html> */
 html[data-theme='dark'] {
   --bg: #332F3B;
   --text: rgba(255, 255, 255, 0.87);
@@ -69,12 +68,10 @@ html[data-theme='light'] {
   --publish-btn-color: #ffffff;
   --publish-btn-hover: var(--link-hover);
 
-  /* borde morado sutil en modo claro para mantener consistencia */
   --card-border: rgba(111,75,255,0.12);
   --card-shadow: 0 6px 18px rgba(111,75,255,0.06);
 }
 
-/* Card variables */
 :root {
   --card-bg: var(--bg);
   --card-border: rgba(0,0,0,0.06);
@@ -83,7 +80,6 @@ html[data-theme='light'] {
   --card-title: var(--text);
   --card-text: var(--text);
   --muted-text: rgba(107,114,128,1);
-  /* icon + vote colors (defaults) */
   --icon-fg: var(--text);
   --vote-up: #22c55e;
   --vote-down: #ef4444;
@@ -97,7 +93,6 @@ html[data-theme='light'] {
 
 html[data-theme='dark'] {
   --card-bg: #3b3342;
-  /* más contraste y tono morado para bordes en oscuro */
   --card-border: rgba(79,63,110,0.35);
   --card-shadow: 0 6px 18px rgba(0,0,0,0.18);
   --card-border-width: 3px;
@@ -133,7 +128,6 @@ html[data-theme='light'] {
   --vote-down-shadow: rgba(220,38,38,0.12);
 }
 
-/* Icon button and vote button styles */
 .icon-btn {
   color: var(--icon-fg);
 }
@@ -161,7 +155,6 @@ html[data-theme='light'] {
   100% { transform: scale(1); }
 }
 
-/* Ensure links/icons in header use icon color */
 .header-basic .icon-btn, .header-basic .icon-btn svg {
   color: var(--icon-fg);
   fill: currentColor;
@@ -205,8 +198,6 @@ button {
 button:hover {
   border-color: #646cff;
 }
-/* Only show focus ring when navigated by keyboard (focus-visible).
-   Prevent mouse click showing the white ring; keep accessibility for keyboard users. */
 button:focus {
   outline: none;
 }
@@ -214,7 +205,7 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-/* Specific interactive elements: use subtle focus-visible ring and no outline on mouse click */
+
 .icon-btn:focus, .vote-btn:focus, .sidebar-link:focus {
   outline: none;
 }

@@ -7,8 +7,7 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL
 );
 
--- 2. Insertar un usuario de prueba
--- ¡IMPORTANTE! Este UUID lo necesitaremos en el script de Mongo.
+-- Insertar un usuario de prueba
 -- Este hash es para "password123" (debes generar uno real con bcrypt en tu app)
 INSERT INTO users (id, email, username, password_hash)
 VALUES 

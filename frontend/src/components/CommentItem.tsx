@@ -17,15 +17,13 @@ export default function CommentItem({ comment, depth, onReplySubmit }: Props) {
   const currentUser = authService.getUser();
   const MAX_DEPTH = 5; 
 
-  // --- 1. LÓGICA DE ENLACES INTELIGENTES ---
-  // Verificamos si el autor del comentario es el usuario logueado
+  // Verificamos si autor == usuario comentando
   const isMe = currentUser?.username === comment.authorId.username;
   
-  // Definimos la ruta destino: mi perfil (editable) o perfil de invitado (solo lectura)
+  // aca vemos si es un profile o si es un invitado 
   const profileLink = isMe 
     ? `/profile/${comment.authorId.username}` 
     : `/guest-profile/${comment.authorId.username}`;
-  // -----------------------------------------
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

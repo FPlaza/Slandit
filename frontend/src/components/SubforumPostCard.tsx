@@ -13,17 +13,12 @@ export default function SubforumPostCard({ post }: Props) {
   const [userVote, setUserVote] = useState<VoteStatus>(null);
   const [animate, setAnimate] = useState(false);
   
-  // Obtenemos el usuario actual para saber si ya votó
   const currentUser = authService.getUser();
-  // Normalizamos el id del autor (soporta populated doc o string)
   const isAuthor = currentUser?.username === post.authorId.username;
   const profileLink = isAuthor 
       ? `/profile/${post.authorId.username}` 
       : `/guest-profile/${post.authorId.username}`;
 
-  // 2. Calcular estado inicial basado en datos reales de Mongo
-  // Dependemos solo de `post._id` para evitar sobrescribir el score
-  // cuando llegan re-renders del padre después de un voto local.
   useEffect(() => {
     if (!currentUser) {
       setUserVote(null);
@@ -38,7 +33,6 @@ export default function SubforumPostCard({ post }: Props) {
       setUserVote(null);
     }
     
-    // Inicializamos el score con el valor del post al montar o cambiar de post
     setScore(post.voteScore);
   }, [post._id, currentUser]);
 
@@ -69,7 +63,7 @@ export default function SubforumPostCard({ post }: Props) {
           else setUserVote(null);
         }
       } catch (err) {
-        // ignore
+        // ignoramos aca
       }
     };
 
@@ -77,32 +71,24 @@ export default function SubforumPostCard({ post }: Props) {
     return () => window.removeEventListener('post-updated', handler as EventListener);
   }, [post._id, currentUser]);
 
-  // 3. Manejadores de Voto conectados a la API
   const handleUp = async () => {
     if (!currentUser) return alert("Inicia sesión para votar");
 
-    // Optimistic UI: Actualizamos visualmente antes de que el servidor responda
-    // (Opcional, pero se siente más rápido)
     const previousVote = userVote;
     const previousScore = score;
     
     try {
-      // Llamamos al backend
       const updatedPost = await postService.toggleUpvote(post._id);
       
-      // El backend nos devuelve el post actualizado con el cálculo exacto
       setScore(updatedPost.voteScore);
       
-      // Recalculamos el estado del botón basado en la respuesta real
       if (updatedPost.upvotedBy.includes(currentUser.id)) setUserVote('up');
       else setUserVote(null);
 
-      // Emitimos evento para sincronizar otras vistas (normalizamos id y _id)
       window.dispatchEvent(new CustomEvent('post-updated', { detail: { ...updatedPost, id: (updatedPost as any)._id || (updatedPost as any).id } }));
 
     } catch (error) {
       console.error("Error votando:", error);
-      // Si falla, revertimos (Rollback)
       setUserVote(previousVote);
       setScore(previousScore);
     }
@@ -119,7 +105,6 @@ export default function SubforumPostCard({ post }: Props) {
       if (updatedPost.downvotedBy.includes(currentUser.id)) setUserVote('down');
       else setUserVote(null);
 
-      // Emitimos evento para sincronizar otras vistas (normalizamos id y _id)
       window.dispatchEvent(new CustomEvent('post-updated', { detail: { ...updatedPost, id: (updatedPost as any)._id || (updatedPost as any).id } }));
 
     } catch (error) {
@@ -136,7 +121,6 @@ export default function SubforumPostCard({ post }: Props) {
 
     try {
       await postService.deletePost(post._id);
-      // Emitimos evento global para que listas lo quiten
       window.dispatchEvent(new CustomEvent('post-deleted', { detail: { id: post._id } }));
     } catch (err) {
       console.error('Error eliminando post:', err);
@@ -155,7 +139,7 @@ export default function SubforumPostCard({ post }: Props) {
       alignItems: 'flex-start',
       boxShadow: 'var(--card-shadow)'
     }}>
-      {/* SECCIÓN DE VOTOS */}
+      {/* votos */}
       <div style={{ width: 40, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <button 
           className={`vote-btn up ${userVote === 'up' ? 'active' : ''}`} 
@@ -180,11 +164,11 @@ export default function SubforumPostCard({ post }: Props) {
         </button>
       </div>
 
-      {/* CONTENIDO DEL POST */}
+      {/* info del post */}
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 8 }}>
           
-          {/* Avatar del Autor (Usando authorId populado) */}
+          {/* icon del autor */}
           <Link to={profileLink} style={{ display: 'inline-block' }}>
             <img 
               src={post.authorId.avatarUrl || '/icons/surprisedrudo.png'} 
@@ -195,13 +179,13 @@ export default function SubforumPostCard({ post }: Props) {
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ fontSize: 14, color: 'var(--muted-text)' }}>
-              {/* Link al Perfil */}
+              {/* link al profile del usuario */}
               por <Link to={profileLink} style={{ color: 'var(--muted-text)', textDecoration: 'none', fontWeight: 500 }}>
                 @{post.authorId.username}
               </Link>
             </div>
             
-            {/* Título (Link al detalle del post) */}
+            {/* titulo */}
             <Link to={`/posts/${post._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <h3 style={{ margin: 0, color: 'var(--card-title)', fontSize: '1.1rem' }}>{post.title}</h3>
             </Link>
@@ -210,14 +194,14 @@ export default function SubforumPostCard({ post }: Props) {
 
         <p style={{ margin: '8px 0', color: 'var(--card-text)', lineHeight: 1.5 }}>{post.content}</p>
 
-        {/* Footer del Post */}
+        {/* footer */}
         <div style={{ marginTop: 12, display: 'flex', gap: 12, alignItems: 'center', color: 'var(--muted-text)', fontSize: 13 }}>
           <Link to={`/posts/${post._id}`} style={{ color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
              💬 <span>{post.commentCount} comentarios</span>
           </Link>
           <span>•</span>
           <span>{new Date(post.createdAt).toLocaleString()}</span>
-          {/* Mostrar botón eliminar solo al autor */}
+          {/* boton eliminar (solo si es el autor el usuario logeado) */}
           {isAuthor && (
             <button
               onClick={handleDelete}

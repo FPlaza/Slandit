@@ -26,7 +26,6 @@ export class PostsController {
 
   @Get('hot') // Endpoint: GET /posts/hot
   async getHotPosts() {
-    // No tiene @UseGuards, así que cualquiera puede verlo
     return this.postsService.getHotPosts();
   }
 

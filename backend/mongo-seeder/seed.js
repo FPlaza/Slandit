@@ -23,8 +23,7 @@ async function runSeed() {
     await db.collection('subforums').deleteMany({});
     await db.collection('posts').deleteMany({});
     
-    // --- 1. Crear Perfiles ---
-    // (Incluyendo el nuevo campo 'currency')
+    // Crear Perfiles de Usuario
     const profiles = [
       {
         _id: TEST_USER_ID, // Vinculado a Postgres
@@ -32,7 +31,7 @@ async function runSeed() {
         bio: 'Solo soy un usuario de prueba.',
         avatarUrl: null,
         karma: 0,
-        currency: 50, // No tiene suficiente para crear un subforo
+        currency: 50,
         createdAt: new Date()
       },
       {
@@ -41,33 +40,31 @@ async function runSeed() {
         bio: 'Soy el admin.',
         avatarUrl: null,
         karma: 100,
-        currency: 1000, // ¡Tiene suficiente para crear!
+        currency: 1000,
         createdAt: new Date()
       }
     ];
     await db.collection('profiles').insertMany(profiles);
     console.log('Insertados perfiles de prueba.');
 
-    // --- 2. Crear un Subforo ---
-    // (El 'adminuser' lo crea)
+    // Crear un Subforo
     const subforumResult = await db.collection('subforums').insertOne({
       name: 'programacion',
       displayName: 'Programación',
       description: 'Un lugar para hablar de código.',
       administrator: ADMIN_USER_ID, // Vinculado al admin
-      memberCount: 2, // testuser y adminuser
+      memberCount: 2,
       createdAt: new Date()
     });
-    const subforumId = subforumResult.insertedId; // Guardamos el ID
+    const subforumId = subforumResult.insertedId;
     console.log('Insertado subforo de prueba.');
 
-    // --- 3. Crear una Publicación ---
-    // (El 'testuser' publica en el subforo 'programacion')
+    // Crear una Publicación 
     await db.collection('posts').insertOne({
       title: '¡Hola Mundo!',
       content: 'Esta es la primera publicación en el foro de prueba.',
       authorId: TEST_USER_ID,
-      subforumId: subforumId, // ¡Publicación DENTRO del subforo!
+      subforumId: subforumId,
       voteScore: 1,
       upvotedBy: [TEST_USER_ID],
       downvotedBy: [],
@@ -87,5 +84,4 @@ async function runSeed() {
   }
 }
 
-// Ejecutar la función
 runSeed();

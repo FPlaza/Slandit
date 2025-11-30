@@ -15,7 +15,6 @@ function handleAuthSuccess(data: { accessToken: string; user: any }) {
     localStorage.setItem('user', JSON.stringify(data.user));
   }
 
-  // 🔥 Dispara evento para que Header, Sidebar, etc. se actualicen
   window.dispatchEvent(new Event("auth-changed"));
 
   return data;
@@ -45,7 +44,6 @@ export const authService = {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
 
-    // 🔥 MUY IMPORTANTE: avisar a la app del cambio
     window.dispatchEvent(new Event("auth-changed"));
   },
 

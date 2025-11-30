@@ -5,42 +5,36 @@ import { commentService } from '../services/commentService';
 import { authService } from '../services/authService';
 import type { Post as PostType } from '../types/post.types';
 import type { Comment } from '../types/comment.types';
-import CommentItem from '../components/CommentItem'; // <--- ¡Asegúrate de tener este componente creado!
+import CommentItem from '../components/CommentItem';
 import '../styles/Post.css';
 import { MdChatBubbleOutline } from 'react-icons/md';
 
-// Definimos el tipo para el estado del voto local
 type VoteStatus = 'up' | 'down' | null;
 
 export default function Post() {
-  const { id } = useParams(); // ID del post
+  const { id } = useParams();
   const navigate = useNavigate();
   
   const [post, setPost] = useState<PostType | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Estados para el nuevo comentario (Principal)
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
   
-  // Estados para la lógica de votación
   const [score, setScore] = useState<number>(0);
   const [userVote, setUserVote] = useState<VoteStatus>(null);
   
   const user = authService.getUser();
 
-  // 1. Cargar datos al inicio
   useEffect(() => {
     const loadData = async () => {
       if (!id) return;
       setLoading(true);
       try {
-        // Cargar Post
         const postData = await postService.getPostById(id);
         setPost(postData);
         
-        // Inicializar estados de voto con datos reales
         setScore(postData.voteScore);
         if (user) {
             if (postData.upvotedBy.includes(user.id)) setUserVote('up');
@@ -48,7 +42,6 @@ export default function Post() {
             else setUserVote(null);
         }
 
-        // Cargar Comentarios
         const commentsData = await commentService.getCommentsByPostId(id);
         setComments(commentsData);
       } catch (error) {
@@ -61,53 +54,44 @@ export default function Post() {
   }, [id, user?.id]);
 
 
-  // --- LÓGICA DE ÁRBOL DE COMENTARIOS ---
+  // aca va la logica del arbol de comentarios
   const buildCommentTree = (flatComments: Comment[]) => {
     const commentMap: { [key: string]: Comment } = {};
     const roots: Comment[] = [];
 
-    // Paso 1: Crear mapa y añadir array de hijos vacío
     flatComments.forEach(c => {
       commentMap[c._id] = { ...c, children: [] };
     });
 
-    // Paso 2: Organizar jerarquía
     flatComments.forEach(c => {
       if (c.parentId && commentMap[c.parentId]) {
-        // Es hijo: lo metemos en el padre
         commentMap[c.parentId].children!.push(commentMap[c._id]);
       } else {
-        // Es raíz: va al array principal
         roots.push(commentMap[c._id]);
       }
     });
 
-    // Ordenar por fecha: más recientes abajo (opcional)
     return roots.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   };
 
   const commentTree = buildCommentTree(comments);
 
-  // --- MANEJO DE RESPUESTAS (Principal y Anidadas) ---
   const handleReplySubmit = async (content: string, parentId?: string) => {
     if (!content.trim() || !id) return;
     if (!user) return alert("Inicia sesión para comentar");
 
-    // Si es comentario principal, activamos loading del form principal
     if (!parentId) setSubmitting(true);
 
     try {
       await commentService.createComment({
         content: content,
         postId: id,
-        parentId: parentId, // Si existe, es respuesta anidada
+        parentId: parentId,
       });
       
-      // Recargar comentarios para reconstruir el árbol
       const commentsData = await commentService.getCommentsByPostId(id);
       setComments(commentsData);
       
-      // Si fue comentario principal, limpiamos el input grande
       if (!parentId) setNewComment('');
       
     } catch (error) {
@@ -118,7 +102,7 @@ export default function Post() {
   };
 
 
-  // 3. Manejadores de Voto (Lógica idéntica a PostCard)
+  // aca manejamos los votos
   const handleUp = async () => {
     if (!user) return alert("Inicia sesión para votar");
     const previousVote = userVote;
@@ -159,9 +143,9 @@ export default function Post() {
   return (
     <main className="post-detail-container">
       
-      {/* --- LA TARJETA DEL POST --- */}
+      {/* tarjetita del post */}
       <article className="post-detail-card">
-        {/* Barra lateral de votos */}
+        {/* sidebar de votos */}
         <div className="post-votes-sidebar">
            <button 
              className={`vote-btn up ${userVote === 'up' ? 'active' : ''}`} 
@@ -179,7 +163,7 @@ export default function Post() {
         </div>
 
         <div className="post-content-wrapper">
-          {/* Header: Subforo y Autor */}
+          {/* aca va el header */}
           <div className="post-header-info">
             <img 
               src={post.subforumId.icon || '/icons/default.png'} 
@@ -201,15 +185,15 @@ export default function Post() {
             <span>{new Date(post.createdAt).toLocaleString()}</span>
           </div>
 
-          {/* Título */}
+          {/* titulo */}
           <h1 className="post-detail-title">{post.title}</h1>
           
-          {/* Contenido */}
+          {/* contenido */}
           <div className="post-detail-body">
              {post.content}
           </div>
 
-          {/* Footer */}
+          {/* footer */}
           <div style={{ display: 'flex', gap: 10, color: 'var(--muted-text)', fontSize: 14, marginTop: 20 }}>
              <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                <MdChatBubbleOutline size={22}/> 
@@ -219,10 +203,10 @@ export default function Post() {
         </div>
       </article>
 
-      {/* --- SECCIÓN DE COMENTARIOS --- */}
+      {/* seccion d comentarios */}
       <section className="comments-section">
         
-        {/* Formulario PRINCIPAL (para comentar el post directamente) */}
+        {/* aqui es donde se comenta */}
         {user ? (
           <form className="comment-form" onSubmit={(e) => { e.preventDefault(); handleReplySubmit(newComment); }}>
             <textarea 
@@ -243,14 +227,14 @@ export default function Post() {
           </div>
         )}
 
-        {/* Lista de Comentarios RECURSIVA */}
+        {/* comentarios de forma recursiva */}
         <div className="comments-list">
            {commentTree.map(rootComment => (
              <CommentItem 
                key={rootComment._id} 
                comment={rootComment} 
-               depth={0} // Nivel inicial
-               onReplySubmit={handleReplySubmit} // Pasamos la función manejadora
+               depth={0}
+               onReplySubmit={handleReplySubmit}
              />
            ))}
            

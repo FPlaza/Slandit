@@ -7,7 +7,6 @@ import type { Post } from '../types/post.types';
 function Feed() {
   const [posts, setPosts] = useState<Post[] | null>(null);
 
-  // 1. Carga inicial del Feed
   useEffect(() => {
     let mounted = true;
 
@@ -20,7 +19,6 @@ function Feed() {
         const token = authService.getToken();
 
         if (token) {
-           // A. Logueado
            const myFeed = await postService.getMyFeed();
            if (myFeed && myFeed.length > 0) {
              data = myFeed;
@@ -28,7 +26,6 @@ function Feed() {
              data = await postService.getHotPosts();
            }
         } else {
-           // B. Invitado
            data = await postService.getHotPosts();
         }
 
@@ -39,10 +36,8 @@ function Feed() {
       }
     };
 
-    // Cargar al montar
     load();
 
-    // Escuchar evento
     const handleAuthChange = () => load();
     window.addEventListener('auth-changed', handleAuthChange);
 
@@ -52,15 +47,13 @@ function Feed() {
     };
   }, []);
 
-  // 2. Sincronización en tiempo real (Votos)
-  // Escucha el evento 'post-updated' que emite PostCard al votar
+
   useEffect(() => {
     const handler = (e: Event) => {
       try {
         const detail = (e as CustomEvent).detail;
         if (!detail) return;
 
-        // El ID puede venir como _id (backend) o id (frontend legado)
         const updatedId = detail._id || detail.id;
         if (!updatedId) return;
 
@@ -68,11 +61,9 @@ function Feed() {
           if (!prev) return prev;
           
           return prev.map((p) => {
-            // Encontramos el post que cambió
             if (p._id === updatedId) {
               return {
                 ...p,
-                // Actualizamos solo lo que cambió
                 voteScore: typeof detail.voteScore === 'number' ? detail.voteScore : p.voteScore,
                 upvotedBy: detail.upvotedBy || p.upvotedBy,
                 downvotedBy: detail.downvotedBy || p.downvotedBy,
@@ -91,8 +82,6 @@ function Feed() {
     return () => window.removeEventListener('post-updated', handler as EventListener);
   }, []);
 
-  // 3. Sincronización de Borrado
-  // Escucha el evento 'post-deleted'
   useEffect(() => {
     const delHandler = (e: Event) => {
       try {
@@ -106,7 +95,6 @@ function Feed() {
           return prev.filter(p => p._id !== deletedId);
         });
       } catch (err) {
-        // ignore
       }
     };
 

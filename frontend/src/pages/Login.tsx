@@ -22,7 +22,6 @@ function Login() {
       }
 
     } catch (err: any) {
-      // Manejo básico de error, podrías mostrar err.response.data.message si existe
       setError("Credenciales incorrectas");
     }
   };
@@ -70,7 +69,7 @@ function Login() {
       </div>
 
       <div className="login-links">
-        {/* 2. Cambiamos los <a> por <Link> apuntando a tus rutas definidas */}
+        {/* asignamos links */}
         <Link to="/register">¿No tienes una cuenta aún?</Link>
         
         <Link to="/">Permanecer desconectado</Link>

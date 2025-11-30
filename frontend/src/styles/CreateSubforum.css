@@ -85,7 +85,6 @@
   font-size: 0.8rem;
 }
 
-/* IMAGENES */
 .images-section {
   display: flex;
   gap: 20px;
@@ -123,7 +122,6 @@
   height: 80px;
 }
 
-/* Botones */
 .form-actions {
   display: flex;
   justify-content: flex-end;

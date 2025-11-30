@@ -79,7 +79,7 @@
   position: absolute;
   top: 0px;
   right: 0px;
-  background-color: #e91e63; /* Color llamativo */
+  background-color: #e91e63;
   color: white;
   font-size: 0.65rem;
   font-weight: bold;
@@ -90,14 +90,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--header-bg); /* Borde para separar del icono */
+  border: 2px solid var(--header-bg);
 }
 
-/* El contenedor del menú desplegable */
 .notifications-dropdown {
   position: absolute;
-  top: 120%; /* Justo debajo del botón */
-  right: -10px; /* Alineado a la derecha */
+  top: 120%;
+  right: -10px;
   width: 300px;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -135,9 +134,8 @@
   background: rgba(255,255,255,0.05);
 }
 
-/* Estilo para las no leídas */
 .notif-item.unread {
-  background: rgba(33, 150, 243, 0.1); /* Un azul muy sutil */
+  background: rgba(33, 150, 243, 0.1);
   border-left: 3px solid #2196f3;
 }
 

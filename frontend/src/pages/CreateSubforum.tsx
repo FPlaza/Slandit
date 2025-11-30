@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { subforumService } from '../services/subforumService';
-import { imageService } from '../services/imageService';// Asegúrate de tener este servicio creado
+import { imageService } from '../services/imageService';
 import { authService } from '../services/authService';
-import '../styles/CreateSubforum.css'; // (Te doy el CSS abajo)
+import '../styles/CreateSubforum.css';
 
 export default function CreateSubforum() {
   const navigate = useNavigate();
@@ -25,9 +25,7 @@ export default function CreateSubforum() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Manejar cambio de nombre (Slug automático)
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Solo permite letras, números y guiones bajos/medios
     const val = e.target.value.replace(/\s+/g, '_').toLowerCase().replace(/[^a-z0-9_-]/g, '');
     setName(val);
   };
@@ -56,7 +54,6 @@ export default function CreateSubforum() {
       let iconUrl = '';
       let bannerUrl = '';
 
-      // 1. Subir imágenes si existen
       if (iconFile) {
         const url = await imageService.uploadImage(iconFile, 'icons');
         if (url) iconUrl = url;
@@ -67,7 +64,6 @@ export default function CreateSubforum() {
         if (url) bannerUrl = url;
       }
 
-      // 2. Crear Subforo
       const newSubforum = await subforumService.createSubforum({
         name,
         displayName,
@@ -76,13 +72,11 @@ export default function CreateSubforum() {
         banner: bannerUrl
       });
 
-      // 3. Actualizar Sidebar (disparar evento) y Navegar
       window.dispatchEvent(new Event("auth-changed")); 
       navigate(`/subforum/${newSubforum._id}`);
 
     } catch (err: any) {
       console.error(err);
-      // Intentar leer el mensaje del backend
       const msg = err.response?.data?.message || 'Error al crear la comunidad. Intenta otro nombre.';
       setError(msg);
     } finally {
@@ -110,7 +104,7 @@ export default function CreateSubforum() {
 
         <form onSubmit={handleSubmit} className="create-form">
           
-          {/* Nombre y Slug */}
+          {/* nombre del subforo */}
           <div className="form-group">
             <label>Nombre del subforo <span className="required">*</span></label>
             <div className="input-prefix-wrapper">
@@ -127,7 +121,7 @@ export default function CreateSubforum() {
             <small>Este será el link único de tu subforo. No se puede cambiar después.</small>
           </div>
 
-          {/* Display Name */}
+          {/* nombre visible */}
           <div className="form-group">
             <label>Título Visible <span className="required">*</span></label>
             <input 
@@ -140,7 +134,7 @@ export default function CreateSubforum() {
             />
           </div>
 
-          {/* Descripción */}
+          {/* descripcion */}
           <div className="form-group">
             <label>Descripción</label>
             <textarea 
@@ -151,10 +145,10 @@ export default function CreateSubforum() {
             />
           </div>
 
-          {/* SECCIÓN DE IMÁGENES */}
+          {/* aqui van las imagenes */}
           <div className="images-section">
             
-            {/* Icono */}
+            {/* icon */}
             <div className="image-upload-box">
               <label>Ícono</label>
               <div 
@@ -166,7 +160,7 @@ export default function CreateSubforum() {
               <input type="file" accept="image/*" onChange={e => handleImageChange(e, 'icon')} />
             </div>
 
-            {/* Banner */}
+            {/* banner */}
             <div className="image-upload-box">
               <label>Banner</label>
               <div 

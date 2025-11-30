@@ -6,8 +6,6 @@ import { Notification, NotificationSchema } from './schemas/notification.schema'
 
 @Module({
   imports: [
-    // ESTA ES LA LÍNEA QUE TE FALTA:
-    // Registra el esquema para que el servicio pueda inyectarlo como "NotificationModel"
     MongooseModule.forFeature([
       { name: Notification.name, schema: NotificationSchema },
     ]),

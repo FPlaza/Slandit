@@ -1,26 +1,23 @@
-/* Contenedor principal centrado */
 .post-detail-container {
-  max-width: 800px; /* Un poco más estrecho que el perfil para facilitar la lectura */
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
   min-height: calc(100vh - 64px);
 }
 
-/* --- TARJETA PRINCIPAL DEL POST --- */
 .post-detail-card {
   background: var(--card-bg);
   border: var(--card-border-width) solid var(--card-border);
-  border-radius: 8px; /* Coincide con PostCard */
+  border-radius: 8px;
   display: flex;
-  overflow: hidden; /* Para que la barra lateral de votos no se salga */
+  overflow: hidden;
   box-shadow: var(--card-shadow);
   margin-bottom: 20px;
 }
 
-/* Columna de Votos (Izquierda) */
 .post-votes-sidebar {
-  width: 56px; /* Coincide con PostCard */
-  background: rgba(0,0,0,0.02); /* Sutil diferencia de fondo */
+  width: 56px;
+  background: rgba(0,0,0,0.02);
   border-right: 1px solid var(--card-border);
   display: flex;
   flex-direction: column;
@@ -29,13 +26,11 @@
   gap: 4px;
 }
 
-/* Contenido del Post (Derecha) */
 .post-content-wrapper {
   flex: 1;
   padding: 16px 24px;
 }
 
-/* Header (Subforo, Autor, Fecha) */
 .post-header-info {
   display: flex;
   align-items: center;
@@ -54,7 +49,7 @@
 
 .subforum-link {
   font-weight: 700;
-  color: var(--card-text); /* O un color de acento si prefieres */
+  color: var(--card-text);
   text-decoration: none;
 }
 
@@ -71,7 +66,6 @@
   text-decoration: underline;
 }
 
-/* Título y Cuerpo */
 .post-detail-title {
   margin: 0 0 16px 0;
   font-size: 24px;
@@ -83,11 +77,10 @@
   font-size: 16px;
   line-height: 1.6;
   color: var(--card-text);
-  white-space: pre-wrap; /* Respeta saltos de línea */
+  white-space: pre-wrap;
   margin-bottom: 20px;
 }
 
-/* --- SECCIÓN DE COMENTARIOS --- */
 .comments-section {
   background: var(--card-bg);
   border: var(--card-border-width) solid var(--card-border);
@@ -105,7 +98,7 @@
   padding: 12px;
   border: 1px solid var(--card-border);
   border-radius: 8px;
-  background: var(--bg-color); /* Un poco más oscuro que la tarjeta */
+  background: var(--bg-color);
   color: var(--card-text);
   font-family: inherit;
   font-size: 14px;
@@ -135,7 +128,6 @@
   cursor: not-allowed;
 }
 
-/* Estilo de un Comentario Individual */
 .comment-item {
   margin-bottom: 20px;
   padding-bottom: 20px;
@@ -166,7 +158,6 @@
   color: var(--card-text);
 }
 
-/* Estados de carga/error */
 .page-loading, .page-error {
   padding: 40px;
   text-align: center;

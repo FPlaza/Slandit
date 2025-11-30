@@ -1,3 +1,7 @@
+//Esto lo usabamos antes cuando tabamos teniendo problemas al conectar inicializar la 
+// base de datos, pero ya no es necesario
+
+
 export type MockProfile = {
   id: string;
   username: string;
@@ -25,7 +29,6 @@ export const mockProfile: MockProfile = {
   bio: 'No me funciona el backend me vuelvo loco casera',
 };
 
-// Simulamos una colección de perfiles (como si vinieran de la base de datos)
 export const mockProfiles: MockProfile[] = [
   mockProfile,
   { id: 'u2', username: 'rudowolf', displayName: 'DJ Gachi', avatarUrl: '/icons/rudopfp1.png', bio: 'Música, stickers y memes.' },
@@ -40,7 +43,6 @@ export const mockProfiles: MockProfile[] = [
 ];
 
 export const mockPosts: MockPost[] = [
-  // Gachiakuta posts
   {
     id: 'p1',
     title: 'Teoria Serie del Vigilante',
@@ -75,7 +77,6 @@ export const mockPosts: MockPost[] = [
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 30).toISOString(),
   },
 
-  // Nueva publicación de Branquito en Gachiakuta
   {
     id: 'p10',
     title: 'Conchetumanga repone luego',
@@ -88,7 +89,6 @@ export const mockPosts: MockPost[] = [
     createdAt: new Date().toISOString(),
   },
 
-  // JoJo posts
   {
     id: 'p4',
     title: 'Stand users: ¿Cuál es tu favorito?',
@@ -123,7 +123,6 @@ export const mockPosts: MockPost[] = [
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(),
   },
 
-  // One Piece posts
   {
     id: 'p7',
     title: 'Dónde ver One Piece legalmente',
