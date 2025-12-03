@@ -2,26 +2,24 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
-## Project setup
+# Instalación y ejecución proyecto
+Para la ejecución del proyecto, la conexión se realiza automáticamente hacia las bases de datos en la nube de PostgreSQL, MongoDB y Redis. Todas estas conexiones están definidas en el archivo de variables de entorno `.env`, por lo que se requiere tener la última versión del mismo.
+## Instalación de librerías y paquetes
 
 ```bash
 $ npm install
 ```
 
-## Compile and run the project
+## Compilar y ejecutar el proyecto
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
 $ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
-## 🚀 Entorno de Desarrollo Local con Docker
+---
+
+# Desarrollo Local
+## Entorno de Desarrollo Local con Docker (Solo para desarrollo local)
 
 Este proyecto utiliza Docker Compose para crear un entorno de desarrollo local, idéntico y replicable para todos los miembros del equipo. El nombre del proyecto está definido como `slandit` dentro del archivo `docker-compose.yml`.
 
@@ -78,7 +76,7 @@ Esto detiene y *elimina* los contenedores de forma segura. **Tus datos NO se bor
 
 ---
 
-### 🚨 Cómo Resetear la Base de Datos (¡Cuidado!)
+### Cómo Resetear la Base de Datos (¡Cuidado!)
 
 Si en algún momento quieres **borrar todos los datos** y volver al estado inicial (solo con los datos de prueba originales), debes eliminar los volúmenes.
 
