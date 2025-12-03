@@ -43,7 +43,7 @@ function Login() {
             <input
               type="text"
               id="username"
-              placeholder="Nombre de usuario o email"
+              placeholder="Email"
               required
               value={usernameOrEmail}
               onChange={(e) => setUsernameOrEmail(e.target.value)}
